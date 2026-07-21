@@ -4,6 +4,17 @@ Hackathon: `agentic-payments-defai`
 
 Register immediately after the public GitHub repository exists. Registration creates a private draft and returns the assigned `celo_...` attribution tag; it does not publish the final submission.
 
+## Current registration
+
+- Status: `draft`
+- Public repository: `https://github.com/Some1Uknow/paycrawl`
+- Submission ID: `1144f6b7-e90b-4cb1-839e-75b661fb4940`
+- Assigned attribution tag: `celo_468e1efe7287`
+- Published: no
+- Agent/payTo wallet: pending
+
+Use `celo_468e1efe7287` for direct transactions sent by PayCrawl. Celo facilitator x402 settlements are attributed through the agent/payTo wallet saved in the submission, so add that wallet before the first production settlement.
+
 ## Registration-stage inputs
 
 - Builder name
