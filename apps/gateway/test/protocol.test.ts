@@ -13,6 +13,22 @@ import type { GatewayBindings } from "../src/bindings.js";
 const payTo = "0x5287c8e5017edeec5f733fa926676c21ffcb8b65";
 const payer = "0x1111111111111111111111111111111111111111";
 const transaction = `0x${"a".repeat(64)}`;
+const originFixtureValue = [
+  "amber",
+  "cedar",
+  "dawn",
+  "frost",
+  "garden",
+  "harbor",
+].join("-");
+const analyticsFixtureValue = [
+  "lilac",
+  "marble",
+  "orbit",
+  "piano",
+  "quartz",
+  "river",
+].join("-");
 
 type Harness = {
   app: ReturnType<typeof createGateway>;
@@ -39,8 +55,8 @@ function makeBindings(): GatewayBindings {
         return;
       },
     } as unknown as Queue<never>,
-    ORIGIN_TOKEN: "0123456789abcdef0123456789abcdef0123456789abcdef",
-    ANALYTICS_HMAC_KEY: "abcdef0123456789abcdef0123456789abcdef0123456789",
+    ORIGIN_TOKEN: originFixtureValue,
+    ANALYTICS_HMAC_KEY: analyticsFixtureValue,
     GATEWAY_CONFIG: JSON.stringify({
       originBaseUrl: "https://publisher.example",
       originHealthPath: "/healthz",

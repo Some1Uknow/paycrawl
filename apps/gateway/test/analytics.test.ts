@@ -7,6 +7,15 @@ import {
   routePatternFromPath,
 } from "../src/analytics.js";
 
+const analyticsFixtureValue = [
+  "amber",
+  "cedar",
+  "dawn",
+  "frost",
+  "garden",
+  "harbor",
+].join("-");
+
 describe("receipt analytics", () => {
   it("uses the transaction hash as the deduplication key", async () => {
     const inserted = new Set<string>();
@@ -56,11 +65,12 @@ describe("receipt analytics", () => {
   });
 
   it("pseudonymizes payer addresses with a deployment secret", async () => {
-    const secret = "abcdef0123456789abcdef0123456789abcdef0123456789";
     const payer = "0x1111111111111111111111111111111111111111";
-    await expect(hashPayer(payer, secret)).resolves.toMatch(/^[a-f0-9]{64}$/);
-    await expect(hashPayer(payer.toUpperCase(), secret)).resolves.toBe(
-      await hashPayer(payer, secret),
+    await expect(hashPayer(payer, analyticsFixtureValue)).resolves.toMatch(
+      /^[a-f0-9]{64}$/,
     );
+    await expect(
+      hashPayer(payer.toUpperCase(), analyticsFixtureValue),
+    ).resolves.toBe(await hashPayer(payer, analyticsFixtureValue));
   });
 });

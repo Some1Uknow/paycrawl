@@ -10,7 +10,14 @@ const config = {
   facilitatorUrl: "https://api.x402.celo.org" as const,
   network: "eip155:42220" as const,
 };
-const originToken = "0123456789abcdef0123456789abcdef0123456789abcdef";
+const originFixtureValue = [
+  "amber",
+  "cedar",
+  "dawn",
+  "frost",
+  "garden",
+  "harbor",
+].join("-");
 
 describe("fixed-origin redirects", () => {
   it("follows a same-origin redirect", async () => {
@@ -18,7 +25,7 @@ describe("fixed-origin redirects", () => {
     const result = await fetchProtectedOrigin(
       new Request("https://gateway.example/agent/page/article-1"),
       config,
-      originToken,
+      originFixtureValue,
       async () => {
         calls += 1;
         return calls === 1
@@ -39,7 +46,7 @@ describe("fixed-origin redirects", () => {
       fetchProtectedOrigin(
         new Request("https://gateway.example/agent/page/article-1"),
         config,
-        originToken,
+        originFixtureValue,
         async () =>
           new Response(null, {
             status: 302,
@@ -54,7 +61,7 @@ describe("fixed-origin redirects", () => {
       fetchProtectedOrigin(
         new Request("https://gateway.example/agent/page/article-1"),
         config,
-        originToken,
+        originFixtureValue,
         async () =>
           new Response(null, {
             status: 302,
@@ -69,7 +76,7 @@ describe("fixed-origin redirects", () => {
       fetchProtectedOrigin(
         new Request("https://gateway.example/agent/page/article-1"),
         { ...config, originBaseUrl: "https://publisher.example/content" },
-        originToken,
+        originFixtureValue,
         async () =>
           new Response(null, {
             status: 302,
@@ -84,7 +91,7 @@ describe("fixed-origin redirects", () => {
       fetchProtectedOrigin(
         new Request("https://gateway.example/agent/page/article-1"),
         config,
-        originToken,
+        originFixtureValue,
         async () =>
           new Response(null, {
             status: 200,
@@ -100,28 +107,28 @@ describe("origin health", () => {
     await expect(
       probeOrigin(
         config,
-        originToken,
+        originFixtureValue,
         async () => new Response(null, { status: 204 }),
       ),
     ).resolves.toBe(true);
     await expect(
       probeOrigin(
         config,
-        originToken,
+        originFixtureValue,
         async () => new Response(null, { status: 401 }),
       ),
     ).resolves.toBe(false);
     await expect(
       probeOrigin(
         config,
-        originToken,
+        originFixtureValue,
         async () => new Response(null, { status: 403 }),
       ),
     ).resolves.toBe(false);
     await expect(
       probeOrigin(
         config,
-        originToken,
+        originFixtureValue,
         async () => new Response(null, { status: 404 }),
       ),
     ).resolves.toBe(false);
@@ -132,7 +139,7 @@ describe("origin health", () => {
     await expect(
       probeOrigin(
         { ...config, originBaseUrl: "https://publisher.example/content" },
-        originToken,
+        originFixtureValue,
         async (input, init) => {
           seenRequest = new Request(input, init);
           return new Response(null, { status: 204 });
@@ -143,7 +150,7 @@ describe("origin health", () => {
     expect(seenRequest?.url).toBe("https://publisher.example/content/healthz");
     expect(seenRequest?.method).toBe("HEAD");
     expect(seenRequest?.headers.get("x-paycrawl-origin-token")).toBe(
-      originToken,
+      originFixtureValue,
     );
   });
 });

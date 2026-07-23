@@ -9,6 +9,15 @@ import {
   sanitizeOriginResponseHeaders,
 } from "../src/security.js";
 
+const originFixtureValue = [
+  "amber",
+  "cedar",
+  "dawn",
+  "frost",
+  "garden",
+  "harbor",
+].join("-");
+
 describe("origin lock", () => {
   it("builds paths under the configured HTTPS origin", () => {
     expect(
@@ -35,10 +44,7 @@ describe("origin lock", () => {
     expect(() => assertStrongSecret("short", "ORIGIN_TOKEN")).toThrow();
     expect(() => assertStrongSecret("o".repeat(40), "ORIGIN_TOKEN")).toThrow();
     expect(() =>
-      assertStrongSecret(
-        "0123456789abcdef0123456789abcdef0123456789abcdef",
-        "ORIGIN_TOKEN",
-      ),
+      assertStrongSecret(originFixtureValue, "ORIGIN_TOKEN"),
     ).not.toThrow();
   });
 });
@@ -52,11 +58,13 @@ describe("origin headers", () => {
       "Payment-Signature": "hidden",
       "X-Forwarded-For": "203.0.113.1",
     });
-    const originToken = "0123456789abcdef0123456789abcdef0123456789abcdef";
-    const headers = buildOriginRequestHeaders(requestHeaders, originToken);
+    const headers = buildOriginRequestHeaders(
+      requestHeaders,
+      originFixtureValue,
+    );
 
     expect(headers.get("accept")).toBe("text/html");
-    expect(headers.get("x-paycrawl-origin-token")).toBe(originToken);
+    expect(headers.get("x-paycrawl-origin-token")).toBe(originFixtureValue);
     expect(headers.get("authorization")).toBeNull();
     expect(headers.get("cookie")).toBeNull();
     expect(headers.get("payment-signature")).toBeNull();
