@@ -1,0 +1,9 @@
+# These exact historical fingerprints are deterministic test fixtures and an
+# explicitly invalid development-env example, not deployed credentials. Keep
+# this list narrow; real secrets must be removed and rotated, never ignored.
+40172f35bc9a0f843bf5ee572898594dbee6c600:apps/gateway/test/analytics.test.ts:generic-api-key:59
+40172f35bc9a0f843bf5ee572898594dbee6c600:apps/gateway/test/security.test.ts:generic-api-key:55
+40172f35bc9a0f843bf5ee572898594dbee6c600:apps/gateway/test/proxy.test.ts:generic-api-key:13
+40172f35bc9a0f843bf5ee572898594dbee6c600:apps/gateway/.dev.vars.example:generic-api-key:4
+40172f35bc9a0f843bf5ee572898594dbee6c600:apps/gateway/test/protocol.test.ts:generic-api-key:42
+40172f35bc9a0f843bf5ee572898594dbee6c600:apps/gateway/test/protocol.test.ts:generic-api-key:43
