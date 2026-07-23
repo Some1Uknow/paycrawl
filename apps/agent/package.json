@@ -1,0 +1,31 @@
+{
+  "name": "@paycrawl/agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "paycrawl": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsup --config tsup.config.ts",
+    "crawl": "tsx src/index.ts",
+    "lint": "eslint src test",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@paycrawl/shared": "workspace:*",
+    "@x402/core": "2.19.0",
+    "@x402/evm": "2.19.0",
+    "@x402/fetch": "2.19.0",
+    "commander": "^13.1.0",
+    "dotenv": "^16.6.1",
+    "viem": "^2.31.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "tsup": "^8.5.0",
+    "tsx": "^4.20.3",
+    "vitest": "^3.2.4"
+  }
+}

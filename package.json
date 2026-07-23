@@ -1,0 +1,35 @@
+{
+  "name": "paycrawl",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Turn block-or-scrape into pay-per-crawl.",
+  "license": "MIT",
+  "packageManager": "pnpm@10.27.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "postcss": "8.5.22",
+      "sharp": "0.35.3"
+    }
+  },
+  "scripts": {
+    "build": "pnpm --filter @paycrawl/shared build && pnpm --filter @paycrawl/gateway build && pnpm --filter @paycrawl/web build && pnpm --filter @paycrawl/agent build",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test",
+    "lint": "pnpm --filter @paycrawl/gateway lint && pnpm --filter @paycrawl/web lint && pnpm --filter @paycrawl/agent lint && pnpm --filter @paycrawl/shared lint",
+    "format:check": "prettier --check .github README.md SECURITY.md apps packages eslint.config.mjs package.json pnpm-workspace.yaml tsconfig.base.json --ignore-unknown",
+    "typecheck": "pnpm --filter @paycrawl/shared typecheck && pnpm --filter @paycrawl/gateway typecheck && pnpm --filter @paycrawl/web typecheck && pnpm --filter @paycrawl/agent typecheck",
+    "test": "pnpm --filter @paycrawl/shared build && pnpm --filter @paycrawl/shared test && pnpm --filter @paycrawl/gateway test && pnpm --filter @paycrawl/agent test",
+    "crawl": "pnpm --filter @paycrawl/agent crawl"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.33.0",
+    "@next/eslint-plugin-next": "^15.5.21",
+    "@types/node": "^22.15.3",
+    "eslint": "^9.33.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.39.0"
+  }
+}

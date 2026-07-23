@@ -1,0 +1,7 @@
+# Generate each value with: openssl rand -hex 32
+# The publisher origin must reject every request without the exact ORIGIN_TOKEN.
+# Do not use these placeholders in a deployed Worker; the gateway rejects them.
+ORIGIN_TOKEN=REPLACE_WITH_A_64_CHARACTER_HEX_SECRET
+ANALYTICS_HMAC_KEY=REPLACE_WITH_A_DIFFERENT_64_CHARACTER_HEX_SECRET
+# JSON matching GatewayConfig. Replace both the origin and the non-zero payout address.
+GATEWAY_CONFIG={"originBaseUrl":"https://publisher.example","originHealthPath":"/healthz","payTo":"0x1111111111111111111111111111111111111111","protectedRoutes":[{"pattern":"/agent/page/*","amountAtomic":"1000"},{"pattern":"/agent/feed/*","amountAtomic":"10000"},{"pattern":"/agent/export/*","amountAtomic":"100000"}],"facilitatorUrl":"https://api.x402.celo.org","network":"eip155:42220"}
