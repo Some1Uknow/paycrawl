@@ -8,7 +8,7 @@
     {
       "binding": "ANALYTICS",
       "database_name": "paycrawl-analytics",
-      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "database_id": "bab7c8e2-3cb4-4ff2-bd8a-d39d8e9b0fb0",
       "migrations_dir": "migrations",
     },
   ],
