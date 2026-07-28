@@ -1231,34 +1231,6 @@ footer > a:not(.brand):hover {
 .reference-content li + li {
   margin-top: 6px;
 }
-.reference-steps {
-  display: grid;
-  gap: 0;
-  margin-top: 17px !important;
-  padding: 0 !important;
-  list-style: none;
-  border: 1px solid var(--line);
-  counter-reset: step;
-}
-.reference-steps li {
-  display: grid;
-  grid-template-columns: 34px 1fr;
-  gap: 10px;
-  margin: 0 !important;
-  padding: 10px 13px;
-  border-bottom: 1px solid var(--line);
-}
-.reference-steps li:last-child {
-  border-bottom: 0;
-}
-.reference-steps li::before {
-  content: counter(step, decimal-leading-zero);
-  counter-increment: step;
-  color: #58792f;
-  font-family: var(--mono);
-  font-size: 10px;
-  line-height: 2;
-}
 .reference-note {
   margin-top: 18px;
   padding: 12px 13px;

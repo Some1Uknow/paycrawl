@@ -92,18 +92,32 @@ export default function DocsPage(): React.ReactElement {
           <section id="overview">
             <h2>Overview</h2>
             <p>Use this sequence to access a paid route.</p>
-            <ol className="reference-steps">
-              <li>Send a request to the route.</li>
+            <ol>
               <li>
-                Read the <code>402 Payment Required</code> response.
-              </li>
-              <li>Validate the price, asset, network, and payout address.</li>
-              <li>Sign the payment with the local wallet.</li>
-              <li>
-                Retry the request with <code>PAYMENT-SIGNATURE</code>.
+                <span>Send a request to the route.</span>
               </li>
               <li>
-                Read the content and <code>PAYMENT-RESPONSE</code> receipt.
+                <span>
+                  Read the <code>402 Payment Required</code> response.
+                </span>
+              </li>
+              <li>
+                <span>
+                  Validate the price, asset, network, and payout address.
+                </span>
+              </li>
+              <li>
+                <span>Sign the payment with the local wallet.</span>
+              </li>
+              <li>
+                <span>
+                  Retry the request with <code>PAYMENT-SIGNATURE</code>.
+                </span>
+              </li>
+              <li>
+                <span>
+                  Read the content and <code>PAYMENT-RESPONSE</code> receipt.
+                </span>
               </li>
             </ol>
             <div className="reference-note">
