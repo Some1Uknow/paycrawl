@@ -127,6 +127,16 @@ For a stricter per-request policy, add `--max-per-request-usdc 0.001`.
 
 Before signing, the CLI decodes the actual 402 and requires exactly one approved payment option: x402 v2, Celo mainnet, the expected native USDC contract, USDC v2 metadata, and a locally configured `payTo`. It reserves the quote against the total budget before signing. It retries only unsigned challenge network requests; a signed request with an ambiguous network result is deliberately not retried.
 
+## Agent skill
+
+The portable [PayCrawl skill](./skills/paycrawl/SKILL.md) gives compatible
+agents a safe x402 workflow: discover a manifest, validate a quote against a
+local Celo-USDC budget, use a local signer, and return a receipt. Copy the
+skills/paycrawl folder into the target agent's skills directory.
+
+The skill does not provide a wallet or custody. The agent runtime must already
+have an approved local signer and payment authority.
+
 ## Web console
 
 Set `PAYCRAWL_GATEWAY_URL` in [apps/web/.env.example](./apps/web/.env.example), then run:

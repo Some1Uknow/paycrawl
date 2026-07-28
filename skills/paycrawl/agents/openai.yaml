@@ -1,0 +1,4 @@
+interface:
+  display_name: "PayCrawl"
+  short_description: "Safely access paid x402 content"
+  default_prompt: "Use $paycrawl to access a paid content route within a strict Celo USDC budget."
