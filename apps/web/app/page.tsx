@@ -2,9 +2,7 @@ import { LiveMetrics } from "../components/live-metrics";
 
 export const revalidate = 300;
 
-const gatewayUrl = "https://gateway.your-domain.example";
-const deployUrl =
-  "https://github.com/Some1Uknow/paycrawl#deploy-a-publisher-gateway";
+const gatewayUrl = "https://paycrawl-gateway.raghu250407.workers.dev";
 
 function Mark(): React.ReactElement {
   return (
@@ -34,16 +32,11 @@ export default function Home(): React.ReactElement {
         </a>
         <div className="nav-links">
           <a href="#how-it-works">Protocol</a>
-          <a href="#install">Install</a>
+          <a href="/docs">How to use it</a>
           <a href="#agent">Agent CLI</a>
         </div>
-        <a
-          className="nav-cta"
-          href={deployUrl}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Deployment guide <span>↗</span>
+        <a className="nav-cta" href="/docs">
+          Start here <span>↗</span>
         </a>
       </nav>
 
@@ -61,21 +54,17 @@ export default function Home(): React.ReactElement {
             receipt for every useful fetch.
           </p>
           <div className="hero-actions">
-            <a
-              className="button button-primary"
-              href={deployUrl}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Read deployment guide <span>↗</span>
+            <a className="button button-primary" href="/docs">
+              How to use PayCrawl <span>↗</span>
             </a>
             <a className="button button-quiet" href="#live">
               View receipt ledger <span>↓</span>
             </a>
           </div>
           <p className="microcopy">
-            No custom contract. No API keys. A signed x402 authorization settles
-            on Celo only after content succeeds.
+            Agents use a publisher&apos;s gateway; they do not deploy PayCrawl.
+            A signed x402 authorization settles on Celo only after content
+            succeeds.
           </p>
         </div>
 
@@ -224,13 +213,8 @@ Cache-Control: private, no-store
             Each publisher owns their Worker, payout address, and origin token.
             PayCrawl never becomes a shared proxy or custodian.
           </p>
-          <a
-            className="button button-primary"
-            href={deployUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Open deployment guide <span>↗</span>
+          <a className="button button-primary" href="/docs#publishers">
+            Publisher setup <span>↗</span>
           </a>
         </div>
         <div className="install-steps">
@@ -270,10 +254,13 @@ Cache-Control: private, no-store
             The agent sets a ceiling <em>before</em> it signs.
           </h2>
           <p>
-            The reference CLI decodes the 402, accepts only Celo mainnet USDC
-            and local payout allowlists, reserves the budget before
+            The beta reference CLI decodes the 402, accepts only Celo mainnet
+            USDC and local payout allowlists, reserves the budget before
             authorization, and never retries an ambiguous signed request.
           </p>
+          <a className="text-link" href="/docs#agents">
+            Agent quick start <span>→</span>
+          </a>
         </div>
         <div className="command-panel">
           <span className="prompt">$</span>
@@ -296,16 +283,16 @@ Cache-Control: private, no-store
           <p className="eyebrow">End-to-end demo</p>
           <h2>Watch the entire receipt chain.</h2>
           <p>
-            Publish a real mainnet recording only after a token-enforcing
-            origin, gateway health check, Celo USDC settlement, queue-backed
-            analytics write, and Celoscan receipt have all been verified.
+            The public beta gateway is live and returns a strict Celo USDC x402
+            challenge. A real paid receipt will appear here after the first
+            separately funded mainnet agent transaction.
           </p>
         </div>
         <div className="demo-frame">
           <div className="play">✓</div>
-          <span>RELEASE ACCEPTANCE REQUIRED</span>
+          <span>BETA GATEWAY LIVE</span>
           <small>
-            See the deployment guide for the live mainnet checklist.
+            Explore the agent and publisher paths in the usage guide.
           </small>
         </div>
       </section>
@@ -326,6 +313,7 @@ Cache-Control: private, no-store
           <span>PayCrawl</span>
         </a>
         <p>Turn block-or-scrape into pay-per-crawl.</p>
+        <a href="/docs">Docs</a>
         <a
           href="https://github.com/Some1Uknow/paycrawl"
           target="_blank"
