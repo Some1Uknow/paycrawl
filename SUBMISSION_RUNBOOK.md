@@ -112,7 +112,7 @@ For Celo facilitator settlements, attribution is based on the submitted agent/pa
 
 The registered wallet owner signs this on Celo mainnet. The agent can prepare the metadata, transaction, and post-registration verification; the builder must approve and sign the transaction.
 
-1. Host a public agent registration JSON at a durable HTTPS URL or IPFS. It should identify PayCrawl, describe paid machine-readable publisher access, include the deployed gateway endpoint, and list the registered wallet with `chainId: 42220`.
+1. The public registration JSON is hosted at `https://paycrawl.vercel.app/.well-known/paycrawl-agent.json`. It identifies PayCrawl, the deployed x402 gateway, and the registered wallet on Celo mainnet.
 2. Register that `agentURI` with the Celo mainnet Identity Registry: `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432`.
 3. Record the minted agent ID and submit either:
    - `https://8004scan.io/agents/celo/<AGENT_ID>`, or

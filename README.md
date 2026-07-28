@@ -151,6 +151,8 @@ The Next.js app includes a token-enforcing, publisher-controlled demo origin for
 
 The origin returns `401` without the token, authenticated `HEAD /healthz` returns `204`, and paid article routes are available under `/agent/page/*`. This is suitable for an honest product demonstration; real publishers should use their own protected content origin.
 
+The web app also serves PayCrawl's public ERC-8004 registration metadata at `/.well-known/paycrawl-agent.json`. Use its deployed HTTPS URL as the `agentURI` when registering the PayCrawl identity on Celo mainnet.
+
 ## Production acceptance checklist
 
 Run these checks against the actual custom domain before announcing a public launch:
