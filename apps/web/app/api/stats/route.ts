@@ -116,7 +116,7 @@ export async function GET(): Promise<NextResponse> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), STATS_TIMEOUT_MS);
   try {
-    const upstream = await fetch(`${gatewayUrl.toString()}/api/stats`, {
+    const upstream = await fetch(`${gatewayUrl.origin}/api/stats`, {
       cache: "no-store",
       headers: { Accept: "application/json" },
       signal: controller.signal,
