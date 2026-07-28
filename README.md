@@ -137,6 +137,20 @@ pnpm --filter @paycrawl/web dev
 
 The site proxies `GET /api/stats` server-side, accepts only a validated HTTPS public-host target, imposes an 8-second / 64 KiB upstream cap, validates the versioned response schema, and refreshes public telemetry every 30 seconds. Until a real gateway URL is configured, it explicitly shows telemetry as unavailable rather than presenting invented metrics.
 
+### Optional hosted demo origin
+
+The Next.js app includes a token-enforcing, publisher-controlled demo origin for the end-to-end launch demo. Deploy the web app, set the server-only `PAYCRAWL_DEMO_ORIGIN_TOKEN` to the same high-entropy value as the gateway's `ORIGIN_TOKEN`, then configure the gateway with:
+
+```ts
+{
+  originBaseUrl: "https://YOUR_WEB_APP_HOST/api/demo-origin",
+  originHealthPath: "/healthz",
+  // remaining production policy fields
+}
+```
+
+The origin returns `401` without the token, authenticated `HEAD /healthz` returns `204`, and paid article routes are available under `/agent/page/*`. This is suitable for an honest product demonstration; real publishers should use their own protected content origin.
+
 ## Production acceptance checklist
 
 Run these checks against the actual custom domain before announcing a public launch:
