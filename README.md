@@ -134,6 +134,10 @@ agents a safe x402 workflow: discover a manifest, validate a quote against a
 local Celo-USDC budget, use a local signer, and return a receipt. Copy the
 skills/paycrawl folder into the target agent's skills directory.
 
+Install it in a skill-aware agent project:
+
+    npx skills add Some1Uknow/paycrawl --skill paycrawl --agent '*' --yes --full-depth
+
 The skill does not provide a wallet or custody. The agent runtime must already
 have an approved local signer and payment authority.
 

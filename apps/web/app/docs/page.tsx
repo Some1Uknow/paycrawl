@@ -128,6 +128,20 @@ export default function DocsPage(): React.ReactElement {
 
           <section id="agent">
             <h2>Agent setup</h2>
+            <h3>Install the skill</h3>
+            <p>
+              Install the PayCrawl workflow skill in the agent project. It
+              supports all detected skill-aware agents.
+            </p>
+            <CodeBlock>
+              {
+                "npx skills add Some1Uknow/paycrawl --skill paycrawl --agent '*' --yes --full-depth"
+              }
+            </CodeBlock>
+            <p>
+              The skill validates the payment terms and budget. The agent still
+              needs an approved local wallet or signer.
+            </p>
             <h3>1. Read the manifest</h3>
             <p>
               Read the manifest before you pay. It lists the payment terms for
