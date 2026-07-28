@@ -31,53 +31,51 @@ export default function Home(): React.ReactElement {
           <span>PayCrawl</span>
         </a>
         <div className="nav-links">
-          <a href="#how-it-works">Protocol</a>
-          <a href="/docs">How to use it</a>
-          <a href="#agent">Agent CLI</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="#live">Live ledger</a>
         </div>
         <a className="nav-cta" href="/docs">
-          Start here <span>↗</span>
+          Read the docs <span>↗</span>
         </a>
       </nav>
 
-      <section className="hero" id="top">
+      <section className="hero landing-hero" id="top">
         <div className="hero-copy">
           <p className="eyebrow hero-kicker">
-            <span className="signal" /> Celo · x402 v2 · edge-native
+            <span className="signal" /> Celo USDC · x402 v2
           </p>
           <h1>
-            Make every <em>crawl</em> an honest transaction.
+            Content that <em>pays</em> its way.
           </h1>
           <p className="hero-lede">
-            PayCrawl is a Cloudflare edge gateway for publishers who want AI
-            agents to read machine-ready content—and pay a tiny, verifiable USDC
-            receipt for every useful fetch.
+            PayCrawl lets an AI agent buy machine-readable content in one HTTP
+            flow. Publishers get paid directly; agents stay in control of their
+            own wallet and budget.
           </p>
           <div className="hero-actions">
-            <a className="button button-primary" href="/docs">
-              How to use PayCrawl <span>↗</span>
+            <a className="button button-primary" href="/docs#agents">
+              I&apos;m an agent <span>↗</span>
             </a>
-            <a className="button button-quiet" href="#live">
-              View receipt ledger <span>↓</span>
+            <a className="button button-quiet" href="/docs#publishers">
+              I&apos;m a publisher <span>↗</span>
             </a>
           </div>
           <p className="microcopy">
-            Agents use a publisher&apos;s gateway; they do not deploy PayCrawl.
-            A signed x402 authorization settles on Celo only after content
-            succeeds.
+            No account with PayCrawl. No shared custody. The payment itself is
+            the access credential.
           </p>
         </div>
 
         <div className="hero-diagram" aria-label="PayCrawl payment sequence">
           <div className="diagram-topline">
-            <span>REQUEST TRACE / 001</span>
+            <span>ONE REQUEST / ONE RECEIPT</span>
             <span>USDC / CELO</span>
           </div>
           <div className="trace">
             <div className="trace-node agent-node">
               <span className="node-index">01</span>
-              <strong>Agent</strong>
-              <small>asks for /agent/page</small>
+              <strong>Ask</strong>
+              <small>agent requests content</small>
             </div>
             <div className="trace-arrow">
               <span>402</span>
@@ -85,227 +83,58 @@ export default function Home(): React.ReactElement {
             </div>
             <div className="trace-node gate-node">
               <span className="node-index">02</span>
-              <strong>Edge gateway</strong>
-              <small>quotes exact USDC</small>
+              <strong>Approve</strong>
+              <small>wallet signs exact USDC</small>
             </div>
             <div className="trace-arrow">
-              <span>sign</span>
+              <span>retry</span>
               <i />
             </div>
             <div className="trace-node celo-node">
               <span className="node-index">03</span>
-              <strong>Celo</strong>
-              <small>settles after origin OK</small>
+              <strong>Read</strong>
+              <small>content and receipt arrive</small>
             </div>
           </div>
           <div className="trace-receipt">
             <span className="receipt-dot" /> <span>PAYMENT-RESPONSE</span>
-            <code>0x7d…e3b</code>
-            <b>settled</b>
+            <code>on-chain receipt</code>
+            <b>only on success</b>
           </div>
           <div className="scanline" />
         </div>
       </section>
 
-      <section className="tension-band" aria-label="The publisher problem">
-        <p>Publishers face an impossible choice:</p>
-        <div>
-          <span>block agents</span>
-          <i>or</i>
-          <span>fund unmetered scraping</span>
-        </div>
-        <strong>
-          PayCrawl creates a third route: <em>cooperative paid access.</em>
-        </strong>
-      </section>
-
-      <section className="protocol-section" id="how-it-works">
-        <header className="section-heading">
-          <p className="eyebrow">The protocol</p>
-          <h2>One request. One bounded authorization. One receipt.</h2>
-        </header>
-        <ol className="protocol-steps">
+      <section className="landing-flow" id="how-it-works">
+        <p className="eyebrow">No checkout page</p>
+        <h2>Just an ordinary request that knows how to pay.</h2>
+        <ol>
           <li>
-            <span className="step-number">01</span>
-            <div>
-              <h3>Discover</h3>
-              <p>
-                Agents read the free manifest at{" "}
-                <code>/.well-known/paycrawl.json</code> and see only Celo USDC
-                prices.
-              </p>
-            </div>
+            <span>01</span>
+            <p>Discover a route and its price for free.</p>
           </li>
           <li>
-            <span className="step-number">02</span>
-            <div>
-              <h3>Challenge</h3>
-              <p>
-                A request to a paid route receives a standard 402 with a base64{" "}
-                <code>PAYMENT-REQUIRED</code> declaration—before a key is ever
-                touched.
-              </p>
-            </div>
+            <span>02</span>
+            <p>Accept only the price and publisher your policy allows.</p>
           </li>
           <li>
-            <span className="step-number">03</span>
-            <div>
-              <h3>Deliver &amp; settle</h3>
-              <p>
-                The gateway verifies the authorization, fetches the locked
-                publisher origin, then settles only successful GET responses and
-                returns <code>PAYMENT-RESPONSE</code>.
-              </p>
-            </div>
+            <span>03</span>
+            <p>Receive content only after the payment settles.</p>
           </li>
         </ol>
-      </section>
-
-      <section className="specimen-grid" aria-label="Protocol examples">
-        <article className="terminal-card">
-          <div className="terminal-bar">
-            <span />
-            <span />
-            <span />
-            <b>free discovery</b>
-          </div>
-          <pre>
-            <code>{`GET ${gatewayUrl}/.well-known/paycrawl.json
-
-{
-  "protocol": "x402",
-  "network": "eip155:42220",
-  "asset": "0xcebA…32118C",
-  "endpoints": [
-    { "pattern": "/agent/page/*", "amountAtomic": "1000" }
-  ]
-}`}</code>
-          </pre>
-        </article>
-        <article className="terminal-card redline">
-          <div className="terminal-bar">
-            <span />
-            <span />
-            <span />
-            <b>unpaid request</b>
-          </div>
-          <pre>
-            <code>{`GET ${gatewayUrl}/agent/page/article-1
-
-HTTP/1.1 402 Payment Required
-PAYMENT-REQUIRED: eyJ4NDAyVmVyc2lvbiI6Miw...
-Cache-Control: private, no-store
-
-{ "error": "payment required" }`}</code>
-          </pre>
-        </article>
+        <a
+          className="text-link landing-link"
+          href={`${gatewayUrl}/agent/page/article-1`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Inspect the live 402 challenge <span>↗</span>
+        </a>
       </section>
 
       <section id="live" className="live-wrap">
         <LiveMetrics />
       </section>
-
-      <section className="install-section" id="install">
-        <div className="install-intro">
-          <p className="eyebrow">Publisher setup</p>
-          <h2>Three steps from origin to paid machine route.</h2>
-          <p>
-            Each publisher owns their Worker, payout address, and origin token.
-            PayCrawl never becomes a shared proxy or custodian.
-          </p>
-          <a className="button button-primary" href="/docs#publishers">
-            Publisher setup <span>↗</span>
-          </a>
-        </div>
-        <div className="install-steps">
-          <article>
-            <span>1</span>
-            <h3>Create analytics</h3>
-            <p>
-              Create a D1 database, paste its ID into{" "}
-              <code>wrangler.jsonc</code>, then apply the included migration.
-            </p>
-          </article>
-          <article>
-            <span>2</span>
-            <h3>Lock the origin</h3>
-            <p>
-              Set high-entropy <code>ORIGIN_TOKEN</code> and{" "}
-              <code>ANALYTICS_HMAC_KEY</code> secrets. Configure{" "}
-              <code>/healthz</code> to return 204 only when the origin token is
-              valid.
-            </p>
-          </article>
-          <article>
-            <span>3</span>
-            <h3>Set policy</h3>
-            <p>
-              Supply one HTTPS origin, a Celo payout address, and explicit
-              atomic USDC prices for page, feed, and export paths.
-            </p>
-          </article>
-        </div>
-      </section>
-
-      <section className="agent-section" id="agent">
-        <div>
-          <p className="eyebrow">For autonomous buyers</p>
-          <h2>
-            The agent sets a ceiling <em>before</em> it signs.
-          </h2>
-          <p>
-            The beta reference CLI decodes the 402, accepts only Celo mainnet
-            USDC and local payout allowlists, reserves the budget before
-            authorization, and never retries an ambiguous signed request.
-          </p>
-          <a className="text-link" href="/docs#agents">
-            Agent quick start <span>→</span>
-          </a>
-        </div>
-        <div className="command-panel">
-          <span className="prompt">$</span>
-          <pre>
-            <code>{`pnpm crawl \\
-  --url ${gatewayUrl}/agent/page/article-1 \\
-  --max-requests 100 \\
-  --max-total-usdc 0.10 \\
-  --concurrency 1`}</code>
-          </pre>
-          <div className="command-foot">
-            <span>payer key: local .env only</span>
-            <span>budget: $0.10 maximum</span>
-          </div>
-        </div>
-      </section>
-
-      <section className="demo-section">
-        <div>
-          <p className="eyebrow">End-to-end demo</p>
-          <h2>Watch the entire receipt chain.</h2>
-          <p>
-            The public beta gateway is live and returns a strict Celo USDC x402
-            challenge. A real paid receipt will appear here after the first
-            separately funded mainnet agent transaction.
-          </p>
-        </div>
-        <div className="demo-frame">
-          <div className="play">✓</div>
-          <span>BETA GATEWAY LIVE</span>
-          <small>
-            Explore the agent and publisher paths in the usage guide.
-          </small>
-        </div>
-      </section>
-
-      <aside className="limitation">
-        <span>Important boundary</span>
-        <p>
-          This cooperative paid machine route does not stop a malicious crawler
-          from impersonating a human browser. Publishers should continue to
-          protect or restrict their ordinary origin; PayCrawl makes the
-          authorized agent path explicit, paid, and auditable.
-        </p>
-      </aside>
 
       <footer>
         <a className="brand" href="#top">

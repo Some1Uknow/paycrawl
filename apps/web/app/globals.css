@@ -681,6 +681,56 @@ code {
 .text-link:hover span {
   transform: translateX(4px);
 }
+.landing-flow {
+  padding: 110px 8vw 104px;
+  background: var(--paper-deep);
+}
+.landing-flow h2 {
+  max-width: 770px;
+  margin: 0;
+  font-size: clamp(43px, 5.5vw, 79px);
+  font-weight: 500;
+  line-height: 0.87;
+  letter-spacing: -0.08em;
+}
+.landing-flow ol {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 64px 0 35px;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.landing-flow li {
+  min-height: 138px;
+  padding: 21px 30px 21px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  border-right: 1px solid var(--line);
+}
+.landing-flow li + li {
+  padding-left: 30px;
+}
+.landing-flow li:last-child {
+  border-right: 0;
+}
+.landing-flow li span {
+  color: #58792f;
+  font-family: var(--mono);
+  font-size: 10px;
+}
+.landing-flow li p {
+  max-width: 245px;
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+.landing-flow .landing-link {
+  color: #486127;
+}
 .command-panel {
   align-self: center;
   color: var(--paper);
@@ -1181,6 +1231,28 @@ footer > a:not(.brand):hover {
   .path-grid {
     grid-template-columns: 1fr;
   }
+  .landing-flow {
+    padding: 82px 8vw;
+  }
+  .landing-flow ol {
+    grid-template-columns: 1fr;
+    margin: 45px 0 29px;
+  }
+  .landing-flow li,
+  .landing-flow li + li {
+    min-height: auto;
+    padding: 20px 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .landing-flow li:last-child {
+    border-bottom: 0;
+  }
+  .landing-flow li {
+    display: grid;
+    grid-template-columns: 45px 1fr;
+    gap: 10px;
+  }
   .path-card {
     min-height: 280px;
     padding: 42px 8vw 38px;
@@ -1268,6 +1340,9 @@ footer > a:not(.brand):hover {
   }
   .docs-hero h1 {
     font-size: 58px;
+  }
+  .landing-flow h2 {
+    font-size: 43px;
   }
   .docs-hero > p:not(.eyebrow),
   .beta-strip p:not(.eyebrow) {
