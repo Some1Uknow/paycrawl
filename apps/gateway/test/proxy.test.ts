@@ -5,7 +5,7 @@ import { fetchProtectedOrigin, probeOrigin } from "../src/proxy.js";
 const config = {
   originBaseUrl: "https://publisher.example",
   originHealthPath: "/healthz",
-  payTo: "0x5287c8e5017edeec5f733fa926676c21ffcb8b65",
+  payTo: "0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7",
   protectedRoutes: [{ pattern: "/agent/page/*", amountAtomic: "1000" }],
   facilitatorUrl: "https://api.x402.celo.org" as const,
   network: "eip155:42220" as const,

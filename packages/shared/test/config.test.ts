@@ -8,7 +8,7 @@ import {
 
 const validConfig = {
   originBaseUrl: "https://publisher.example/content",
-  payTo: "0x5287c8e5017edeec5f733fa926676c21ffcb8b65",
+  payTo: "0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7",
   protectedRoutes: [
     { pattern: "/agent/page/*", amountAtomic: "1000" },
     { pattern: "/agent/feed/*", amountAtomic: "10000" },

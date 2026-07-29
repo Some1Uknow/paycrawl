@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 import { createGateway } from "../src/app.js";
 import type { GatewayBindings } from "../src/bindings.js";
 
-const payTo = "0x5287c8e5017edeec5f733fa926676c21ffcb8b65";
+const payTo = "0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7";
 const payer = "0x1111111111111111111111111111111111111111";
 const transaction = `0x${"a".repeat(64)}`;
 const originFixtureValue = [

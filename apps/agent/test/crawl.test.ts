@@ -10,7 +10,7 @@ import { crawlOne } from "../src/crawl.js";
 
 const url = "https://gateway.example/agent/page/article-1";
 const payerKey = `0x${"1".repeat(64)}` as const;
-const payTo = "0x5287c8e5017edeec5f733fa926676c21ffcb8b65";
+const payTo = "0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7";
 const challenge: PaymentRequired = {
   x402Version: 2,
   resource: { url },
@@ -67,7 +67,7 @@ describe("network retry policy", () => {
     const result = await crawlOne({
       url,
       privateKey: payerKey,
-      payoutAllowlist: new Set([payTo]),
+      payoutAllowlist: new Set([payTo.toLowerCase()]),
       budget: new SpendBudget(10_000n, 10_000n),
       fetchImpl,
     });
@@ -92,7 +92,7 @@ describe("network retry policy", () => {
       crawlOne({
         url,
         privateKey: payerKey,
-        payoutAllowlist: new Set([payTo]),
+        payoutAllowlist: new Set([payTo.toLowerCase()]),
         budget: new SpendBudget(10_000n, 10_000n),
         fetchImpl,
       }),
@@ -107,7 +107,7 @@ describe("network retry policy", () => {
       crawlOne({
         url: "https://127.0.0.1/agent/page/article-1",
         privateKey: payerKey,
-        payoutAllowlist: new Set([payTo]),
+        payoutAllowlist: new Set([payTo.toLowerCase()]),
         budget: new SpendBudget(10_000n, 10_000n),
         fetchImpl: async () => {
           calls += 1;
@@ -123,7 +123,7 @@ describe("network retry policy", () => {
       crawlOne({
         url,
         privateKey: payerKey,
-        payoutAllowlist: new Set([payTo]),
+        payoutAllowlist: new Set([payTo.toLowerCase()]),
         budget: new SpendBudget(10_000n, 10_000n),
         maxResponseBytes: 4,
         fetchImpl: async () =>
@@ -145,7 +145,7 @@ describe("network retry policy", () => {
       crawlOne({
         url,
         privateKey: payerKey,
-        payoutAllowlist: new Set([payTo]),
+        payoutAllowlist: new Set([payTo.toLowerCase()]),
         budget: new SpendBudget(10_000n, 10_000n),
         timeoutMs: 10,
         fetchImpl: async () => new Response(stalledBody, { status: 200 }),
