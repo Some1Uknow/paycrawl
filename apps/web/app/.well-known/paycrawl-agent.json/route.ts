@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 const GATEWAY_URL = "https://paycrawl-gateway.raghu250407.workers.dev";
-const PAYCRAWL_WALLET = "0x5287c8e5017edeec5f733fa926676c21ffcb8b65";
+const PAYCRAWL_WALLET = "0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7";
 
 export const revalidate = 3600;
 

@@ -4,7 +4,7 @@ import { toDataSuffix } from "@celo/attribution-tags";
 import { useEffect, useState } from "react";
 
 const chainId = "0xa4ec";
-const expectedOwner = "0x5287c8e5017edeec5f733fa926676c21ffcb8b65";
+const expectedOwner = "0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7";
 const identityRegistry = "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432";
 const agentUri = "https://paycrawl.vercel.app/.well-known/paycrawl-agent.json";
 const registerData =

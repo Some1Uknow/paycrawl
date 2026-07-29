@@ -7,7 +7,7 @@ This is the operational path from the current registered draft to a complete, ve
 - Public code: <https://github.com/Some1Uknow/paycrawl>
 - Registered project: **PayCrawl**
 - Assigned attribution tag: `celo_468e1efe7287`
-- Submitted agent/payTo wallet: `0x5287c8e5017edeec5f733fa926676c21ffcb8b65`
+- Submitted agent/payTo wallet: `0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7`
 - Correct x402 v2 / Celo mainnet / native USDC configuration
 - Local quality gates: formatting, lint, typecheck, 36 tests, and production builds
 
@@ -18,7 +18,7 @@ This is the operational path from the current registered draft to a complete, ve
 | Public GitHub repository | `https://github.com/Some1Uknow/paycrawl` | Complete |
 | Telegram handle | Personal `@handle`, 5–32 letters/numbers/underscores | Builder (already used at registration) |
 | Celo network | `celo-mainnet` | Agent, when updating draft |
-| Agent wallet | `0x5287c8e5017edeec5f733fa926676c21ffcb8b65` | Already recorded; verify in draft |
+| Agent wallet | `0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7` | Update the existing draft before the first settlement |
 | X submission post | Public `x.com` / `twitter.com` status URL | Builder |
 | ERC-8004 identity | Public `8004scan.io/agents/celo/<id>` or Celoscan NFT URL | Builder signs; agent prepares |
 | Live demo | Public HTTPS URL for the deployed gateway or web app | Agent deploys after account/origin access |
@@ -56,7 +56,7 @@ For `GATEWAY_CONFIG`, enter valid JSON with the real origin and the existing pay
 {
   "originBaseUrl": "https://YOUR-WEB-APP-HOST/api/demo-origin",
   "originHealthPath": "/healthz",
-  "payTo": "0x5287c8e5017edeec5f733fa926676c21ffcb8b65",
+  "payTo": "0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7",
   "protectedRoutes": [
     { "pattern": "/agent/page/*", "amountAtomic": "1000" },
     { "pattern": "/agent/feed/*", "amountAtomic": "10000" },
@@ -92,7 +92,7 @@ Set Cloudflare WAF rate limits for `/health` and `/api/stats`, then monitor the 
 ## 2. Make one real x402 payment
 
 1. Fund a **separate payer wallet** with a small amount of Celo mainnet USDC. Do not use the private key of the registered `payTo` wallet as the payer.
-2. Create a local, uncommitted `apps/agent/.env` using `apps/agent/.env.example`. Put the payer key only in that local file and allowlist `0x5287c8e5017edeec5f733fa926676c21ffcb8b65`.
+2. Create a local, uncommitted `apps/agent/.env` using `apps/agent/.env.example`. Put the payer key only in that local file and allowlist `0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7`.
 3. Run one real crawl against the deployed paid URL:
 
 ```bash
