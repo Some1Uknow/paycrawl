@@ -7,7 +7,8 @@ This is the operational path from the current registered draft to a complete, ve
 - Public code: <https://github.com/Some1Uknow/paycrawl>
 - Registered project: **PayCrawl**
 - Assigned attribution tag: `celo_468e1efe7287`
-- Submitted agent/payTo wallet: `0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7`
+- Production agent/payTo wallet: `0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7`
+- Celo Builders draft wallet update: pending
 - Correct x402 v2 / Celo mainnet / native USDC configuration
 - Local quality gates: formatting, lint, typecheck, 36 tests, and production builds
 
