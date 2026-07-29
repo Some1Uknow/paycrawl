@@ -14,7 +14,8 @@ Register immediately after the public GitHub repository exists. Registration cre
 - Production payTo / intended agent wallet: `0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7`
 - ERC-8004 agent identity: <https://8004scan.io/agents/celo/9746>
 - Registration transaction: <https://celoscan.io/tx/0xe7c8b85f49518d5e73d2e324a4afa6a17de926c23ad7de734512763d65b2d910>
-- Celo Builders draft wallet: update pending
+- Celo Builders draft wallet: recorded
+- Celo Builders draft ERC-8004 URL: recorded
 
 Use `celo_468e1efe7287` for direct transactions sent by PayCrawl. Celo facilitator x402 settlements are attributed through the agent/payTo wallet saved in the submission, so add that wallet before the first production settlement.
 

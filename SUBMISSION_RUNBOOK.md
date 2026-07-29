@@ -8,23 +8,23 @@ This is the operational path from the current registered draft to a complete, ve
 - Registered project: **PayCrawl**
 - Assigned attribution tag: `celo_468e1efe7287`
 - Production agent/payTo wallet: `0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7`
-- Celo Builders draft wallet update: pending
+- Celo Builders draft wallet and ERC-8004 identity: recorded
 - Correct x402 v2 / Celo mainnet / native USDC configuration
 - Local quality gates: formatting, lint, typecheck, 36 tests, and production builds
 
 ## Required to publish
 
-| Item                            | Exact value or evidence                                                                      | Owner                                                 |
-| ------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| Public GitHub repository        | `https://github.com/Some1Uknow/paycrawl`                                                     | Complete                                              |
-| Telegram handle                 | Personal `@handle`, 5–32 letters/numbers/underscores                                         | Builder (already used at registration)                |
-| Celo network                    | `celo-mainnet`                                                                               | Agent, when updating draft                            |
-| Agent wallet                    | `0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7`                                                 | Update the existing draft before the first settlement |
-| X submission post               | Public `x.com` / `twitter.com` status URL                                                    | Builder                                               |
-| ERC-8004 identity               | <https://8004scan.io/agents/celo/9746>                                                       | Complete: agent ID `9746`, Celo mainnet               |
-| Live demo                       | Public HTTPS URL for the deployed gateway or web app                                         | Agent deploys after account/origin access             |
-| Proof of a real x402 settlement | Gateway response's `PAYMENT-RESPONSE`, Celoscan transaction, D1 row, and `/api/stats` result | Agent verifies after funded payer signs               |
-| Project metadata                | Tagline, description, tracks/bounties, agent contribution notes                              | Drafted below; builder approves                       |
+| Item                            | Exact value or evidence                                                                      | Owner                                     |
+| ------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Public GitHub repository        | `https://github.com/Some1Uknow/paycrawl`                                                     | Complete                                  |
+| Telegram handle                 | Personal `@handle`, 5–32 letters/numbers/underscores                                         | Builder (already used at registration)    |
+| Celo network                    | `celo-mainnet`                                                                               | Recorded in the private draft             |
+| Agent wallet                    | `0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7`                                                 | Recorded in the private draft             |
+| X submission post               | Public `x.com` / `twitter.com` status URL                                                    | Builder                                   |
+| ERC-8004 identity               | <https://8004scan.io/agents/celo/9746>                                                       | Complete: agent ID `9746`, Celo mainnet   |
+| Live demo                       | Public HTTPS URL for the deployed gateway or web app                                         | Agent deploys after account/origin access |
+| Proof of a real x402 settlement | Gateway response's `PAYMENT-RESPONSE`, Celoscan transaction, D1 row, and `/api/stats` result | Agent verifies after funded payer signs   |
+| Project metadata                | Tagline, description, tracks/bounties, agent contribution notes                              | Drafted below; builder approves           |
 
 Video is optional, but a 60–90 second recording is strongly recommended for judging.
 
