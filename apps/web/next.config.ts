@@ -10,6 +10,21 @@ const nextConfig: NextConfig = {
         hostname: "cdn.prod.website-files.com",
         pathname: "/67116d0daddc92483c812e88/**",
       },
+      {
+        protocol: "https",
+        hostname: "cryptologos.cc",
+        pathname: "/logos/**",
+      },
+      {
+        protocol: "https",
+        hostname: "upload.wikimedia.org",
+        pathname: "/wikipedia/commons/**",
+      },
+      {
+        protocol: "https",
+        hostname: "framerusercontent.com",
+        pathname: "/images/**",
+      },
     ],
   },
   async headers() {

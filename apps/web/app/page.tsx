@@ -2,10 +2,13 @@ import { LiveMetrics } from "../components/live-metrics";
 import { HeroChat } from "../components/hero-chat";
 import { MotionReveal, PinnedGallery } from "../components/motion";
 import { SiteFooter, SiteNav } from "../components/site-chrome";
+import Image from "next/image";
 
 export const revalidate = 300;
 
 const gatewayUrl = "https://paycrawl-gateway.raghu250407.workers.dev";
+const celoWordmark =
+  "https://framerusercontent.com/images/ENL3ZjX9OnprxVs5u8A81khADqA.webp?width=592&height=256";
 
 export default function Home(): React.ReactElement {
   return (
@@ -34,6 +37,10 @@ export default function Home(): React.ReactElement {
               <a className="button button-secondary" href="/docs#publisher">
                 Publish a route <span aria-hidden="true">↗</span>
               </a>
+            </div>
+            <div className="hero-powered">
+              <span>Powered by</span>
+              <Image src={celoWordmark} alt="Celo" width={74} height={32} />
             </div>
             <p className="microcopy">
               No account. No shared custody. Payment authorizes access.

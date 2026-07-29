@@ -248,6 +248,23 @@ h1 {
   gap: 12px;
 }
 
+.hero-powered {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 14px;
+  color: var(--text-faint);
+  font: 600 10px/1 var(--mono);
+}
+
+.hero-powered img {
+  display: block;
+  width: 42px;
+  height: 18px;
+  object-fit: contain;
+  object-position: left center;
+}
+
 .button {
   display: inline-flex;
   align-items: center;
@@ -510,6 +527,23 @@ code,
   line-height: 1.5;
 }
 
+.chat-message [data-typing]::after {
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.16em;
+  background: var(--signal);
+  animation: chat-caret 760ms steps(1) infinite;
+  content: "";
+}
+
+@keyframes chat-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
 .chat-link {
   display: block;
   margin-top: 9px;
@@ -535,12 +569,24 @@ code,
   gap: 10px;
 }
 
-.payment-token img {
+.payment-token-marks {
+  display: flex;
+  align-items: center;
+  min-width: 54px;
+}
+
+.payment-token-marks img {
   display: block;
   flex: 0 0 auto;
   width: 32px;
   height: 32px;
+  border-radius: 50%;
   object-fit: contain;
+}
+
+.payment-token-marks img + img {
+  margin-left: -10px;
+  box-shadow: 0 0 0 2px #fbfdfb;
 }
 
 .payment-status {
@@ -1502,5 +1548,9 @@ td code {
 
   .protocol-marquee > div {
     animation-play-state: paused;
+  }
+
+  .chat-message [data-typing]::after {
+    display: none;
   }
 }
