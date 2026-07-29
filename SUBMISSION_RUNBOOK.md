@@ -14,17 +14,17 @@ This is the operational path from the current registered draft to a complete, ve
 
 ## Required to publish
 
-| Item | Exact value or evidence | Owner |
-| --- | --- | --- |
-| Public GitHub repository | `https://github.com/Some1Uknow/paycrawl` | Complete |
-| Telegram handle | Personal `@handle`, 5–32 letters/numbers/underscores | Builder (already used at registration) |
-| Celo network | `celo-mainnet` | Agent, when updating draft |
-| Agent wallet | `0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7` | Update the existing draft before the first settlement |
-| X submission post | Public `x.com` / `twitter.com` status URL | Builder |
-| ERC-8004 identity | Public `8004scan.io/agents/celo/<id>` or Celoscan NFT URL | Builder signs; agent prepares |
-| Live demo | Public HTTPS URL for the deployed gateway or web app | Agent deploys after account/origin access |
-| Proof of a real x402 settlement | Gateway response's `PAYMENT-RESPONSE`, Celoscan transaction, D1 row, and `/api/stats` result | Agent verifies after funded payer signs |
-| Project metadata | Tagline, description, tracks/bounties, agent contribution notes | Drafted below; builder approves |
+| Item                            | Exact value or evidence                                                                      | Owner                                                 |
+| ------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Public GitHub repository        | `https://github.com/Some1Uknow/paycrawl`                                                     | Complete                                              |
+| Telegram handle                 | Personal `@handle`, 5–32 letters/numbers/underscores                                         | Builder (already used at registration)                |
+| Celo network                    | `celo-mainnet`                                                                               | Agent, when updating draft                            |
+| Agent wallet                    | `0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7`                                                 | Update the existing draft before the first settlement |
+| X submission post               | Public `x.com` / `twitter.com` status URL                                                    | Builder                                               |
+| ERC-8004 identity               | <https://8004scan.io/agents/celo/9746>                                                       | Complete: agent ID `9746`, Celo mainnet               |
+| Live demo                       | Public HTTPS URL for the deployed gateway or web app                                         | Agent deploys after account/origin access             |
+| Proof of a real x402 settlement | Gateway response's `PAYMENT-RESPONSE`, Celoscan transaction, D1 row, and `/api/stats` result | Agent verifies after funded payer signs               |
+| Project metadata                | Tagline, description, tracks/bounties, agent contribution notes                              | Drafted below; builder approves                       |
 
 Video is optional, but a 60–90 second recording is strongly recommended for judging.
 
@@ -111,14 +111,12 @@ For Celo facilitator settlements, attribution is based on the submitted agent/pa
 
 ## 3. Register PayCrawl's ERC-8004 identity
 
-The registered wallet owner signs this on Celo mainnet. The agent can prepare the metadata, transaction, and post-registration verification; the builder must approve and sign the transaction.
+Complete. The registered wallet owner signed the Celo mainnet registration transaction, which minted agent ID `9746` and included the assigned `celo_468e1efe7287` attribution tag.
 
 1. The public registration JSON is hosted at `https://paycrawl.vercel.app/.well-known/paycrawl-agent.json`. It identifies PayCrawl, the deployed x402 gateway, and the registered wallet on Celo mainnet.
-2. Register that `agentURI` with the Celo mainnet Identity Registry: `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432`.
-3. Record the minted agent ID and submit either:
-   - `https://8004scan.io/agents/celo/<AGENT_ID>`, or
-   - `https://celoscan.io/nft/0x8004a169fb4a3325136eb29fa0ceb6d2e539a432/<AGENT_ID>`.
-4. If the PayCrawl wallet sends any direct transactions, append `celo_468e1efe7287` as an ERC-8021 suffix and verify it after confirmation. The facilitator settlement itself does not need a mirrored tagged transaction.
+2. Identity Registry: `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432`.
+3. Submit <https://8004scan.io/agents/celo/9746> as the ERC-8004 URL.
+4. Registration proof: <https://celoscan.io/tx/0xe7c8b85f49518d5e73d2e324a4afa6a17de926c23ad7de734512763d65b2d910>.
 
 ## 4. Create the public demo and social evidence
 
@@ -148,15 +146,15 @@ Record 60–90 seconds showing: unpaid 402 → agent budget limit → paid respo
 
 Use these submission values after the live evidence exists:
 
-| Field | Value |
-| --- | --- |
-| Project name | PayCrawl |
-| Tagline | Turn block-or-scrape into pay-per-crawl. |
-| GitHub | `https://github.com/Some1Uknow/paycrawl` |
-| Celo network | `celo-mainnet` |
-| Tracks | `most-x402-payments`, `most-revenue-generated`, `askbots` |
-| Bounties | `most-x402-payments-1st`, `most-x402-payments-2nd`, `most-revenue-generated-1st`, `most-revenue-generated-2nd`, `askbots-prize-pool` |
-| Contract addresses | Omit: PayCrawl uses no custom contract. |
+| Field              | Value                                                                                                                                |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Project name       | PayCrawl                                                                                                                             |
+| Tagline            | Turn block-or-scrape into pay-per-crawl.                                                                                             |
+| GitHub             | `https://github.com/Some1Uknow/paycrawl`                                                                                             |
+| Celo network       | `celo-mainnet`                                                                                                                       |
+| Tracks             | `most-x402-payments`, `most-revenue-generated`, `askbots`                                                                            |
+| Bounties           | `most-x402-payments-1st`, `most-x402-payments-2nd`, `most-revenue-generated-1st`, `most-revenue-generated-2nd`, `askbots-prize-pool` |
+| Contract addresses | Omit: PayCrawl uses no custom contract.                                                                                              |
 
 Description:
 

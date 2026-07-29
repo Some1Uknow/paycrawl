@@ -12,6 +12,8 @@ Register immediately after the public GitHub repository exists. Registration cre
 - Assigned attribution tag: `celo_468e1efe7287`
 - Published: no
 - Production payTo / intended agent wallet: `0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7`
+- ERC-8004 agent identity: <https://8004scan.io/agents/celo/9746>
+- Registration transaction: <https://celoscan.io/tx/0xe7c8b85f49518d5e73d2e324a4afa6a17de926c23ad7de734512763d65b2d910>
 - Celo Builders draft wallet: update pending
 
 Use `celo_468e1efe7287` for direct transactions sent by PayCrawl. Celo facilitator x402 settlements are attributed through the agent/payTo wallet saved in the submission, so add that wallet before the first production settlement.
@@ -32,12 +34,7 @@ Never provide a private key, seed phrase, repository credential, or other secret
 ## Tracks
 
 ```json
-[
-  "most-x402-payments",
-  "most-revenue-generated",
-  "askbots",
-  "track-4-tba"
-]
+["most-x402-payments", "most-revenue-generated", "askbots", "track-4-tba"]
 ```
 
 ## Applicable bounties
