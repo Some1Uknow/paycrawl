@@ -9,7 +9,6 @@ export const metadata: Metadata = {
 const gatewayUrl = "https://paycrawl-gateway.raghu250407.workers.dev";
 const repositoryUrl = "https://github.com/Some1Uknow/paycrawl";
 const deployUrl = `${repositoryUrl}#deploy-a-publisher-gateway`;
-const agentEnvUrl = `${repositoryUrl}/blob/main/apps/agent/.env.example`;
 
 function Mark(): React.ReactElement {
   return (
@@ -144,62 +143,29 @@ export default function DocsPage(): React.ReactElement {
               }
             </CodeBlock>
             <p>
-              The skill validates the payment terms and budget. The agent still
-              needs an approved local wallet or signer.
+              The skill owns discovery, quote validation, payment, and receipt
+              handling. It uses the agent runtime&apos;s approved signer.
             </p>
-            <h3>Fund and govern the agent</h3>
+            <h3>Give the agent authority once</h3>
             <p>
-              Fund the separate wallet controlled by the agent runtime with Celo
-              mainnet USDC. Do not send USDC directly to a publisher. The agent
-              signs an x402 authorization only after it verifies the route,
-              publisher address, price, and its local budget.
+              Connect a funded Celo mainnet USDC wallet through the agent
+              runtime&apos;s own wallet or secret manager. Do not send USDC
+              directly to a publisher and never paste a key into chat.
             </p>
             <p>
-              Set an allowlist of publisher payout addresses, a per-request
-              ceiling, and a total crawl budget. The reference client exposes
-              all three controls and leaves the key on the agent machine.
+              Approve publisher addresses, a per-request ceiling, a total
+              budget, and a request limit. The skill refuses any quote outside
+              that policy.
             </p>
-            <h3>1. Read the manifest</h3>
+            <h3>Ask the agent</h3>
             <p>
-              Read the manifest before you pay. It lists the payment terms for
-              the gateway.
+              Give the agent a route and the limits you want. It reads the
+              manifest, checks the live quote, and returns the content with its
+              receipt.
             </p>
-            <CodeBlock>{`curl --include ${gatewayUrl}/.well-known/paycrawl.json`}</CodeBlock>
-
-            <h3>2. Request a paid route</h3>
-            <p>
-              An unpaid request returns a <code>402</code>. It does not return
-              the protected content.
-            </p>
-            <CodeBlock>{`curl --include ${gatewayUrl}/agent/page/article-1`}</CodeBlock>
-
-            <h3>3. Configure the reference client</h3>
-            <p>
-              The reference client runs from this repository. It keeps the
-              wallet key on the local machine. It checks the payout allowlist
-              and the spend limit before it signs.
-            </p>
-            <CodeBlock>{`git clone ${repositoryUrl}.git
-cd paycrawl
-pnpm install
-cp apps/agent/.env.example apps/agent/.env`}</CodeBlock>
-            <p>
-              Set <code>PAYCRAWL_PAYER_PRIVATE_KEY</code> and{" "}
-              <code>PAYCRAWL_ALLOWED_PAY_TO</code> in{" "}
-              <code>apps/agent/.env</code>. Use the address from the manifest.
-            </p>
-            <CodeBlock>{`pnpm crawl \\
-  --url ${gatewayUrl}/agent/page/article-1 \\
-  --max-requests 1 \\
-  --max-total-usdc 0.001 \\
-  --concurrency 1`}</CodeBlock>
-            <p>
-              See the{" "}
-              <a href={agentEnvUrl} target="_blank" rel="noreferrer">
-                agent environment file
-              </a>{" "}
-              for the required values.
-            </p>
+            <CodeBlock>{`Use PayCrawl to crawl ${gatewayUrl}/agent/page/article-1.
+Allow only Celo USDC. Do not spend more than 0.001 USDC on this request
+or more than 0.01 USDC in total. Return the PAYMENT-RESPONSE receipt.`}</CodeBlock>
           </section>
 
           <section id="publisher">

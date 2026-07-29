@@ -113,6 +113,11 @@ GET /api/stats
 
 ## Crawl as an agent
 
+For a skill-aware agent, install the [PayCrawl skill](#agent-skill) and give
+the runtime a funded signer plus an approved spending policy. The operator
+should not need to clone this repository or configure a private key manually.
+
+The CLI below is the reference integration for agent-runtime developers.
 Create an uncommitted local environment file from [apps/agent/.env.example](./apps/agent/.env.example). It must contain the payer key and a comma-separated allowlist of publisher payout addresses. The key is never accepted as a command-line option.
 
 ```bash
