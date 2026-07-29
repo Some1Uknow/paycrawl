@@ -123,7 +123,8 @@ export default function DocsPage(): React.ReactElement {
               <h3>Install the skill</h3>
               <p>
                 Add the PayCrawl workflow skill to the agent project. It handles
-                discovery, quote validation, payment, and receipt handling.
+                discovery, quote validation, wallet setup, payment, and receipt
+                handling.
               </p>
               <CodeBlock>
                 {
@@ -140,12 +141,11 @@ export default function DocsPage(): React.ReactElement {
               </p>
               <h3>Fund only when asked</h3>
               <p>
-                On the first paid crawl, the reference CLI creates an encrypted
-                dedicated Celo wallet file and reuses it later. An agent runtime
-                can keep the same wallet in its own secure store. If an approved
-                request needs funds, it asks for a bounded Celo USDC top-up to
-                that wallet. Do not paste a private key or send USDC directly to
-                a publisher.
+                On macOS, the agent creates its encrypted dedicated Celo wallet
+                and Keychain secret on the first request. It reuses that wallet
+                later. If an approved request needs funds, it gives you one
+                wallet address and a bounded Celo USDC amount. Do not paste a
+                private key or send USDC directly to a publisher.
               </p>
               <h3>Ask the agent</h3>
               <CodeBlock>{`Use PayCrawl to crawl ${gatewayUrl}/agent/page/article-1.

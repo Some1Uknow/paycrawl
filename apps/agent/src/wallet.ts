@@ -17,6 +17,8 @@ import {
 
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 
+import { resolveWalletPassphrase } from "./wallet-passphrase.js";
+
 const WALLET_VERSION = 1;
 const MIN_PASSPHRASE_LENGTH = 16;
 const DEFAULT_WALLET_FILE = join(
@@ -160,7 +162,9 @@ export async function loadOrCreatePayerWallet(options?: {
       DEFAULT_WALLET_FILE,
   );
   const passphrase = requirePassphrase(
-    options?.passphrase ?? process.env.PAYCRAWL_WALLET_PASSPHRASE,
+    await resolveWalletPassphrase(
+      options?.passphrase ? { passphrase: options.passphrase } : undefined,
+    ),
   );
 
   let raw: string;

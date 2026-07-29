@@ -60,15 +60,16 @@ transaction signing. If it cannot provide those capabilities, stop after the
 unpaid 402 and report that wallet provisioning is unavailable; never fall back
 to a raw key, shared wallet, repository file, or browser checkout.
 
-### Self-hosted reference runtime
+### Self-hosted macOS runtime
 
 The repository CLI can provision the payer wallet locally for a self-hosted
 agent. On its first paid crawl it creates an AES-256-GCM encrypted file at
 `~/.paycrawl/wallets/payer-eip155-42220.json`, locks the file to the owner, and
-reuses the same address later. The passphrase must come from the agent
-runtime's secret store through `PAYCRAWL_WALLET_PASSPHRASE`. Never put a raw
-private key in an environment variable, repository file, prompt, or skill
-message. The CLI checks the Celo USDC balance before it signs. It separately
+reuses the same address later. On macOS it automatically creates or reuses the
+`paycrawl-wallet-passphrase` Keychain item; do not ask the user to create,
+export, or reveal it. Other runtimes supply an equivalent secret provider.
+Never put a raw private key in an environment variable, repository file,
+prompt, or skill message. The CLI checks the Celo USDC balance before it signs. It separately
 stores public publisher approvals at
 `~/.paycrawl/policies/publishers-eip155-42220.json`; that file contains no
 wallet key.
@@ -86,6 +87,28 @@ clear approval. Persist the approved origin/payout pair in the runtime's local
 policy store, then allow future requests to that same pair automatically within
 the spend limits. If either the origin or payout address changes, ask again.
 Never auto-approve a new payout address from a 402 response.
+
+## End-user execution
+
+Do the setup work yourself. Do not tell an end user to run a shell command,
+clone a repository, edit an environment file, create a passphrase, or use a
+browser wallet.
+
+For a self-hosted macOS agent, invoke the local PayCrawl CLI directly. It
+provisions the Keychain secret, encrypted wallet, and publisher-policy file as
+needed. On the first unknown publisher, run the unpaid request, show the
+validated origin, payout address, and quoted amount, and ask for approval. Only
+after a clear approval, rerun that one target with `--approve-publisher`.
+
+If the balance is insufficient, give the user only the persistent payer wallet
+address, `Celo mainnet`, and one bounded Celo-USDC funding amount. For example:
+
+> Fund your PayCrawl agent wallet with 0.01 Celo USDC at
+> `0x…`. I will use that wallet for future approved crawls.
+
+When the user says it is funded, check the balance and resume the same request.
+Never ask for a private key, seed phrase, Keychain value, browser-wallet
+connection, or payment to the publisher directly.
 
 Before signing, compare the wallet's native Celo USDC balance with the next
 quote and approved reserve. If it is insufficient, ask for a single bounded

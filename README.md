@@ -122,8 +122,9 @@ clone this repository, handle a key, or configure an environment file.
 The CLI below is a reference integration for agent-runtime developers. On its
 first paid crawl, it creates an encrypted Celo wallet file at
 `~/.paycrawl/wallets/payer-eip155-42220.json` and reuses it on later crawls.
-The wallet passphrase must come from the agent runtime's secret store. The raw
-private key is never written to the file or printed. It also keeps explicit
+On macOS, it creates or reuses a dedicated `paycrawl-wallet-passphrase` in
+Keychain automatically. Other runtimes provide the passphrase through their
+secret store. The raw private key is never written to the file or printed. It also keeps explicit
 publisher approvals in `~/.paycrawl/policies/publishers-eip155-42220.json`.
 That local policy binds an HTTPS publisher origin to its Celo-USDC payout
 address; it stores no key material.
@@ -176,9 +177,10 @@ Install it in a skill-aware agent project:
 The runtime must provide secure wallet custody, durable wallet-handle storage,
 balance lookup, and signing. The skill defines the wallet lifecycle and funding
 prompt. A self-hosted CLI may use the encrypted wallet file described above;
-the passphrase remains a runtime secret and is never sent to PayCrawl. The
-skill asks for explicit approval only for an unknown publisher origin or a new
-payout address, then persists that local policy for later requests.
+on macOS it provisions the Keychain passphrase automatically. The passphrase
+is never sent to PayCrawl. The skill asks for explicit approval only for an
+unknown publisher origin or a new payout address, then persists that local
+policy for later requests.
 
 ## Web console
 
