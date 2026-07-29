@@ -1,5 +1,4 @@
 import { LiveMetrics } from "../components/live-metrics";
-import { PayWithCelo } from "../components/pay-with-celo";
 
 export const revalidate = 300;
 
@@ -33,7 +32,7 @@ export default function Home(): React.ReactElement {
         </a>
         <div className="nav-links">
           <a href="#how-it-works">How it works</a>
-          <a href="#try">Try it</a>
+          <a href="#start">Start</a>
           <a href="#live">Live ledger</a>
         </div>
         <a className="nav-cta" href="/docs">
@@ -56,10 +55,10 @@ export default function Home(): React.ReactElement {
           </p>
           <div className="hero-actions">
             <a className="button button-primary" href="/docs#agents">
-              Agent setup <span>↗</span>
+              Install for an agent <span>↗</span>
             </a>
-            <a className="button button-quiet" href="#try">
-              Try with a wallet <span>↓</span>
+            <a className="button button-quiet" href="/docs#publisher">
+              Publish a route <span>↗</span>
             </a>
           </div>
           <p className="microcopy">
@@ -134,7 +133,69 @@ export default function Home(): React.ReactElement {
         </a>
       </section>
 
-      <PayWithCelo />
+      <section className="operator-paths" id="start">
+        <header>
+          <p className="eyebrow">Start with your role</p>
+          <h2>Agents pay. Publishers set the terms.</h2>
+        </header>
+        <div className="operator-grid">
+          <article className="operator-card operator-agent">
+            <div className="operator-card-topline">
+              <span>01 / AGENT</span>
+              <span>LOCAL SIGNER</span>
+            </div>
+            <h3>Give the agent a bounded payer wallet.</h3>
+            <ol>
+              <li>
+                Fund the wallet the agent runtime already controls with Celo
+                USDC.
+              </li>
+              <li>
+                Set the publisher allowlist and spend ceiling in the agent
+                policy.
+              </li>
+              <li>
+                Install the workflow skill. The agent validates every live quote
+                before it signs.
+              </li>
+            </ol>
+            <pre className="operator-code">
+              <code>
+                npx skills add Some1Uknow/paycrawl \\ --skill paycrawl --agent
+                '*' --yes --full-depth
+              </code>
+            </pre>
+            <a className="text-link" href="/docs#agent">
+              Agent guide <span>↗</span>
+            </a>
+          </article>
+          <article className="operator-card operator-publisher">
+            <div className="operator-card-topline">
+              <span>02 / PUBLISHER</span>
+              <span>DIRECT PAYOUT</span>
+            </div>
+            <h3>Put a price in front of protected machine-readable routes.</h3>
+            <ol>
+              <li>Keep the origin private behind the PayCrawl origin token.</li>
+              <li>
+                Choose a Celo payout address and an atomic USDC price per route
+                pattern.
+              </li>
+              <li>
+                Deploy the gateway. It issues the 402 and settles only after
+                delivery.
+              </li>
+            </ol>
+            <p className="operator-note">
+              Your payout address receives settlement. PayCrawl does not custody
+              publisher revenue.
+            </p>
+            <a className="text-link" href="/docs#publisher">
+              Publisher guide <span>↗</span>
+            </a>
+          </article>
+        </div>
+      </section>
 
       <section id="live" className="live-wrap">
         <LiveMetrics />

@@ -92,14 +92,10 @@ export default function DocsPage(): React.ReactElement {
           <section id="overview">
             <h2>Overview</h2>
             <p>
-              To use the live route from a browser wallet, open the{" "}
-              <Link href="/#try">checkout</Link>. It shows the price, enforces a
-              per-request cap, and asks the wallet to sign only the displayed
-              Celo USDC authorization.
-            </p>
-            <p>
-              For an agent integration, use this sequence to access a paid
-              route.
+              PayCrawl has two operators: a publisher protects and prices a
+              machine-readable route; an agent discovers its quote and pays it
+              within a local policy. There is no reader checkout and PayCrawl
+              does not custody either wallet.
             </p>
             <ol>
               <li>
@@ -151,6 +147,18 @@ export default function DocsPage(): React.ReactElement {
               The skill validates the payment terms and budget. The agent still
               needs an approved local wallet or signer.
             </p>
+            <h3>Fund and govern the agent</h3>
+            <p>
+              Fund the separate wallet controlled by the agent runtime with Celo
+              mainnet USDC. Do not send USDC directly to a publisher. The agent
+              signs an x402 authorization only after it verifies the route,
+              publisher address, price, and its local budget.
+            </p>
+            <p>
+              Set an allowlist of publisher payout addresses, a per-request
+              ceiling, and a total crawl budget. The reference client exposes
+              all three controls and leaves the key on the agent machine.
+            </p>
             <h3>1. Read the manifest</h3>
             <p>
               Read the manifest before you pay. It lists the payment terms for
@@ -196,7 +204,11 @@ cp apps/agent/.env.example apps/agent/.env`}</CodeBlock>
 
           <section id="publisher">
             <h2>Publisher setup</h2>
-            <p>Current publisher deployment is self-hosted.</p>
+            <p>
+              Current publisher deployment is self-hosted. The publisher keeps
+              control of the origin, payout wallet, route policy, and Cloudflare
+              account.
+            </p>
             <h3>Requirements</h3>
             <ul>
               <li>An HTTPS origin for the protected content.</li>
@@ -204,10 +216,12 @@ cp apps/agent/.env.example apps/agent/.env`}</CodeBlock>
               <li>A Celo wallet address for USDC payments.</li>
               <li>A Cloudflare account for the Worker resources.</li>
             </ul>
-            <h3>Deployment</h3>
+            <h3>Publish a paid route</h3>
             <p>
-              Create the Worker resources. Add the three secrets. Configure the
-              origin, payout address, and route prices. Then deploy the Worker.
+              Lock the origin with the generated token. Create the Worker
+              resources, then add the origin, payout address, and route prices
+              as secrets. When deployed, each configured <code>/agent/*</code>{" "}
+              route returns its quote to an agent automatically.
             </p>
             <a
               className="button button-primary"
