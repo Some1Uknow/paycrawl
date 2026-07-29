@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm, stat } from "node:fs/promises";
+import { chmod, mkdtemp, readFile, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -55,5 +55,21 @@ describe("publisher approval policy", () => {
     ).toBe(false);
     expect(stored).toContain(payTo.toLowerCase());
     expect(details.mode & 0o077).toBe(0);
+  });
+
+  it("does not change permissions on a caller-provided parent directory", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "paycrawl-policy-"));
+    directories.push(directory);
+    await chmod(directory, 0o755);
+    const policy = await loadPublisherPolicy({
+      filePath: join(directory, "publishers.json"),
+    });
+
+    await policy.approve(
+      new URL("https://publisher.example/agent/page/one"),
+      quote,
+    );
+
+    expect((await stat(directory)).mode & 0o777).toBe(0o755);
   });
 });

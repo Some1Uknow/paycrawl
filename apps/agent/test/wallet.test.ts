@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm, stat } from "node:fs/promises";
+import { chmod, mkdtemp, readFile, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -42,5 +42,18 @@ describe("encrypted payer wallet", () => {
     await expect(
       loadOrCreatePayerWallet({ filePath, passphrase: "wrong-passphrase" }),
     ).rejects.toThrow("Unable to unlock the PayCrawl wallet file");
+  });
+
+  it("does not change permissions on a caller-provided parent directory", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "paycrawl-wallet-"));
+    directories.push(directory);
+    await chmod(directory, 0o755);
+
+    await loadOrCreatePayerWallet({
+      filePath: join(directory, "payer.json"),
+      passphrase,
+    });
+
+    expect((await stat(directory)).mode & 0o777).toBe(0o755);
   });
 });

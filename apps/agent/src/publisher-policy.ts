@@ -114,7 +114,11 @@ async function writePolicyFile(
   policy: StoredPublisherPolicy,
 ): Promise<void> {
   await mkdir(dirname(filePath), { recursive: true, mode: 0o700 });
-  await chmod(dirname(filePath), 0o700);
+  // Policy files may be redirected by a runtime. Never chmod a caller-owned
+  // parent directory; only the default PayCrawl directory is managed here.
+  if (filePath === DEFAULT_POLICY_FILE) {
+    await chmod(dirname(filePath), 0o700);
+  }
   const temporaryPath = `${filePath}.${randomBytes(8).toString("hex")}.tmp`;
   await writeFile(temporaryPath, `${JSON.stringify(policy, null, 2)}\n`, {
     encoding: "utf8",

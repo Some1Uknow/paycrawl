@@ -10,7 +10,7 @@ import { loadPublisherPolicy } from "./publisher-policy.js";
 import { loadOrCreatePayerWallet } from "./wallet.js";
 
 type CommandOptions = {
-  urls: string[];
+  url: string[];
   maxRequests: string;
   maxTotalUsdc: string;
   maxPerRequestUsdc?: string;
@@ -42,7 +42,7 @@ async function run(options: CommandOptions): Promise<void> {
   const perRequestLimit = parseUsdc(
     options.maxPerRequestUsdc ?? options.maxTotalUsdc,
   );
-  const targets = [...new Set(options.urls)].slice(0, maxRequests);
+  const targets = [...new Set(options.url)].slice(0, maxRequests);
   if (targets.length === 0) {
     throw new Error("At least one --url is required");
   }

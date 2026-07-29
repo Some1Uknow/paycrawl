@@ -119,7 +119,11 @@ async function writeWalletFile(
   stored: EncryptedWalletFile,
 ): Promise<void> {
   await mkdir(dirname(filePath), { recursive: true, mode: 0o700 });
-  await chmod(dirname(filePath), 0o700);
+  // The managed default directory is private. Do not change permissions on a
+  // caller-provided parent such as the home or system temp directory.
+  if (filePath === DEFAULT_WALLET_FILE) {
+    await chmod(dirname(filePath), 0o700);
+  }
   const temporaryPath = `${filePath}.${randomBytes(8).toString("hex")}.tmp`;
   await writeFile(temporaryPath, `${JSON.stringify(stored, null, 2)}\n`, {
     encoding: "utf8",
