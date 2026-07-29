@@ -12,12 +12,12 @@ credential is attached to the HTTP request. Do not use a browser checkout flow.
 
 - Never ask a user to paste a private key, seed phrase, origin token, or API
   secret into chat.
-- Use only a signer that the agent runtime already controls securely.
+- Use only a runtime-managed signer. Persist its wallet handle, never its raw
+  key, under the stable logical wallet reference `paycrawl:payer:eip155:42220`.
 - Before a signed request, enforce an allowed publisher address, a per-request
   limit, a total limit, and a request limit.
-- If payment authority is not already configured, stop after the unpaid 402
-  request. Report the exact quote and request an approved runtime signer and
-  policy through the agent's secure wallet setup. Do not ask for a key in chat.
+- Do not create an `.env` file or ask an end user to edit one. The repository
+  client is for runtime integrators only.
 - Do not retry a signed request after a network error. Its settlement state can
   be ambiguous.
 - Do not claim payment or delivery unless a successful response contains a
@@ -29,10 +29,12 @@ credential is attached to the HTTP request. Do not use a browser checkout flow.
    and payTo address.
 2. Fetch the protected URL without a payment header. Expect
    402 Payment Required and a PAYMENT-REQUIRED header.
-3. Apply the policy in references/payment-policy.md.
-4. Use the runtime's approved x402 signer to create a payment credential.
-5. Send one signed retry. Do not follow redirects on a paid request.
-6. Return the content and the decoded receipt. Record the transaction hash when
+3. Resolve the persistent payer wallet and apply the policy in
+   references/payment-policy.md.
+4. Check its native Celo USDC balance against the approved budget.
+5. Use the runtime's approved x402 signer to create a payment credential.
+6. Send one signed retry. Do not follow redirects on a paid request.
+7. Return the content and the decoded receipt. Record the transaction hash when
    available.
 
 For the public beta gateway, start with:
@@ -40,18 +42,40 @@ For the public beta gateway, start with:
     curl --include https://paycrawl-gateway.raghu250407.workers.dev/.well-known/paycrawl.json
     curl --include https://paycrawl-gateway.raghu250407.workers.dev/agent/page/article-1
 
-## Use payment authority
+## Agent wallet lifecycle
 
-Use the agent runtime's existing wallet or signer integration. The operator
-provides only these policy inputs through that integration:
+Resolve `paycrawl:payer:eip155:42220` from the agent runtime's secure wallet
+store before every paid request. Reuse that wallet for later crawls.
 
-- a funded Celo mainnet USDC payer wallet controlled by the agent runtime;
+If it does not exist, create a dedicated Celo mainnet payer wallet through the
+runtime's approved wallet provider and persist only its wallet handle and
+address under that reference. Do not use the publisher's `payTo` wallet as the
+payer.
+
+The runtime wallet integration must provide encrypted key custody or a
+hardware/hosted signer, durable storage, address lookup, balance lookup, and
+transaction signing. If it cannot provide those capabilities, stop after the
+unpaid 402 and report that wallet provisioning is unavailable; never fall back
+to a raw key, shared wallet, repository file, or browser checkout.
+
+## Funding and policy
+
+The operator provides only these policy inputs through the wallet integration:
+
 - an approved publisher payout-address allowlist;
 - per-request, total, and request-count limits.
 
-Do not require the operator to clone PayCrawl, run a CLI, or edit an
-environment file to access a route. The repository client is an integration
-reference, not the operator interface.
+Before signing, compare the wallet's native Celo USDC balance with the next
+quote and approved reserve. If it is insufficient, ask for a single bounded
+funding action and include the persistent agent wallet address, Celo mainnet,
+and the minimum USDC amount. For example:
+
+> Your PayCrawl agent wallet needs at least $0.01 Celo USDC to continue within
+> the approved $0.001-per-crawl policy. Fund this wallet once; no private key
+> or repository setup is required.
+
+After funding is visible, resume with the same wallet and policy. Ask again
+only when the balance or spending policy no longer covers the requested crawl.
 
 ## Integrate another agent
 
@@ -65,8 +89,8 @@ Use an x402 v2 EVM client and the runtime signer. The integration must:
 6. Parse PAYMENT-RESPONSE only from a successful response.
 
 Do not add a shared PayCrawl wallet, central key store, or server-side custody
-layer. A skill supplies procedure. The agent runtime supplies the signer and
-the payment authority.
+layer. A skill supplies procedure and wallet-lifecycle requirements; the agent
+runtime supplies the secure wallet implementation.
 
 ## Deploy for a publisher
 

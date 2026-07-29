@@ -113,9 +113,11 @@ GET /api/stats
 
 ## Crawl as an agent
 
-For a skill-aware agent, install the [PayCrawl skill](#agent-skill) and give
-the runtime a funded signer plus an approved spending policy. The operator
-should not need to clone this repository or configure a private key manually.
+For a skill-aware agent, install the [PayCrawl skill](#agent-skill). It keeps a
+dedicated runtime-managed Celo payer wallet at a stable logical reference,
+reuses it on later crawls, and requests a bounded USDC top-up only when its
+approved policy cannot cover the next quote. The operator should not need to
+clone this repository, handle a key, or configure an environment file.
 
 The CLI below is the reference integration for agent-runtime developers.
 Create an uncommitted local environment file from [apps/agent/.env.example](./apps/agent/.env.example). It must contain the payer key and a comma-separated allowlist of publisher payout addresses. The key is never accepted as a command-line option.
@@ -143,8 +145,10 @@ Install it in a skill-aware agent project:
 
     npx skills add Some1Uknow/paycrawl --skill paycrawl --agent '*' --yes --full-depth
 
-The skill does not provide a wallet or custody. The agent runtime must already
-have an approved local signer and payment authority.
+The runtime must provide secure wallet custody, durable wallet-handle storage,
+balance lookup, and signing. The skill defines the wallet lifecycle and funding
+prompt; it never accepts a private key or asks the user to configure a local
+environment file.
 
 ## Web console
 
