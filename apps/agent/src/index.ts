@@ -6,6 +6,7 @@ import { Command } from "commander";
 import { SpendBudget, formatUsdc, parseUsdc } from "./budget.js";
 import { crawlOne, formatResult } from "./crawl.js";
 import { parsePayToAllowlist } from "./payment.js";
+import { loadOrCreatePayerWallet } from "./wallet.js";
 
 type CommandOptions = {
   urls: string[];
@@ -39,25 +40,18 @@ async function run(options: CommandOptions): Promise<void> {
   const perRequestLimit = parseUsdc(
     options.maxPerRequestUsdc ?? options.maxTotalUsdc,
   );
-  const privateKey = process.env.PAYCRAWL_PAYER_PRIVATE_KEY as
-    `0x${string}` | undefined;
-  if (!privateKey) {
-    throw new Error(
-      "PAYCRAWL_PAYER_PRIVATE_KEY is required in an uncommitted local environment file",
-    );
-  }
-
   const targets = [...new Set(options.urls)].slice(0, maxRequests);
   if (targets.length === 0) {
     throw new Error("At least one --url is required");
   }
 
   const budget = new SpendBudget(totalLimit, perRequestLimit);
+  const wallet = await loadOrCreatePayerWallet();
   const payoutAllowlist = parsePayToAllowlist(
     process.env.PAYCRAWL_ALLOWED_PAY_TO,
   );
   process.stderr.write(
-    `PayCrawl: ${targets.length} target(s), concurrency ${concurrency}, total budget ${formatUsdc(totalLimit)} USDC, per-request cap ${formatUsdc(perRequestLimit)} USDC\n`,
+    `PayCrawl: ${targets.length} target(s), concurrency ${concurrency}, total budget ${formatUsdc(totalLimit)} USDC, per-request cap ${formatUsdc(perRequestLimit)} USDC\nPayer wallet: ${wallet.address}\nWallet file: ${wallet.filePath}\n`,
   );
 
   let cursor = 0;
@@ -78,7 +72,7 @@ async function run(options: CommandOptions): Promise<void> {
         try {
           const result = await crawlOne({
             url: target,
-            privateKey,
+            privateKey: wallet.privateKey,
             payoutAllowlist,
             budget,
             maxResponseBytes,

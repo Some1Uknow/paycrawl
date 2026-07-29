@@ -7,6 +7,8 @@ import {
   type PaymentRequired,
 } from "@x402/fetch";
 import { privateKeyToAccount } from "viem/accounts";
+import { createPublicClient, erc20Abi, http } from "viem";
+import { celo } from "viem/chains";
 
 import { formatUsdc, type SpendBudget } from "./budget.js";
 import {
@@ -33,7 +35,25 @@ export type CrawlOptions = {
   fetchImpl?: typeof fetch;
   timeoutMs?: number;
   maxResponseBytes?: number;
+  usdcBalanceOf?: (address: `0x${string}`) => Promise<bigint>;
 };
+
+const CELO_RPC_URL = "https://forno.celo.org";
+
+export async function readCeloUsdcBalance(
+  address: `0x${string}`,
+): Promise<bigint> {
+  const client = createPublicClient({
+    chain: celo,
+    transport: http(process.env.PAYCRAWL_RPC_URL ?? CELO_RPC_URL),
+  });
+  return client.readContract({
+    address: "0xcebA9300f2b948710d2653dD7B07f33A8B32118C",
+    abi: erc20Abi,
+    functionName: "balanceOf",
+    args: [address],
+  });
+}
 
 function assertCrawlUrl(rawUrl: string): URL {
   const url = new URL(rawUrl);
@@ -274,7 +294,18 @@ export async function crawlOne(
   } finally {
     await initial.body?.cancel().catch(() => undefined);
   }
-  validatePaymentRequired(preflightChallenge, url, options.payoutAllowlist);
+  const validatedQuote = validatePaymentRequired(
+    preflightChallenge,
+    url,
+    options.payoutAllowlist,
+  );
+  const balanceOf = options.usdcBalanceOf ?? readCeloUsdcBalance;
+  const balance = await balanceOf(account.address);
+  if (balance < validatedQuote.amountAtomic) {
+    throw new Error(
+      `Payer wallet ${account.address} needs at least ${formatUsdc(validatedQuote.amountAtomic)} USDC on Celo mainnet before it can sign. Fund this wallet once, then run the crawl again`,
+    );
+  }
 
   client.onBeforePaymentCreation(async ({ paymentRequired }) => {
     validateAndReservePayment(

@@ -14,6 +14,8 @@ credential is attached to the HTTP request. Do not use a browser checkout flow.
   secret into chat.
 - Use only a runtime-managed signer. Persist its wallet handle, never its raw
   key, under the stable logical wallet reference `paycrawl:payer:eip155:42220`.
+  A self-hosted reference runtime may use the encrypted wallet file described
+  below; it must never persist a plaintext private key.
 - Before a signed request, enforce an allowed publisher address, a per-request
   limit, a total limit, and a request limit.
 - Do not create an `.env` file or ask an end user to edit one. The repository
@@ -57,6 +59,16 @@ hardware/hosted signer, durable storage, address lookup, balance lookup, and
 transaction signing. If it cannot provide those capabilities, stop after the
 unpaid 402 and report that wallet provisioning is unavailable; never fall back
 to a raw key, shared wallet, repository file, or browser checkout.
+
+### Self-hosted reference runtime
+
+The repository CLI can provision the payer wallet locally for a self-hosted
+agent. On its first paid crawl it creates an AES-256-GCM encrypted file at
+`~/.paycrawl/wallets/payer-eip155-42220.json`, locks the file to the owner, and
+reuses the same address later. The passphrase must come from the agent
+runtime's secret store through `PAYCRAWL_WALLET_PASSPHRASE`. Never put a raw
+private key in an environment variable, repository file, prompt, or skill
+message. The CLI checks the Celo USDC balance before it signs.
 
 ## Funding and policy
 

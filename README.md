@@ -119,10 +119,11 @@ reuses it on later crawls, and requests a bounded USDC top-up only when its
 approved policy cannot cover the next quote. The operator should not need to
 clone this repository, handle a key, or configure an environment file.
 
-The CLI below is a reference integration for agent-runtime developers, not an
-end-user setup path. Its local environment file is only a development harness;
-production agents must inject a runtime-managed signer and policy without
-exposing a key to an operator.
+The CLI below is a reference integration for agent-runtime developers. On its
+first paid crawl, it creates an encrypted Celo wallet file at
+`~/.paycrawl/wallets/payer-eip155-42220.json` and reuses it on later crawls.
+The wallet passphrase must come from the agent runtime's secret store. The raw
+private key is never written to the file or printed.
 
 ```bash
 pnpm crawl \
@@ -149,8 +150,8 @@ Install it in a skill-aware agent project:
 
 The runtime must provide secure wallet custody, durable wallet-handle storage,
 balance lookup, and signing. The skill defines the wallet lifecycle and funding
-prompt; it never accepts a private key or asks the user to configure a local
-environment file.
+prompt. A self-hosted CLI may use the encrypted wallet file described above;
+the passphrase remains a runtime secret and is never sent to PayCrawl.
 
 ## Web console
 

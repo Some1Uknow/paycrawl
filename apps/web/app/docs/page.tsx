@@ -138,11 +138,12 @@ export default function DocsPage(): React.ReactElement {
               </p>
               <h3>Fund only when asked</h3>
               <p>
-                On the first paid crawl, the agent creates a dedicated Celo
-                wallet and saves its secure wallet handle for later crawls. If
-                an approved request needs funds, it asks for a bounded Celo USDC
-                top-up to that wallet. Do not paste a private key or send USDC
-                directly to a publisher.
+                On the first paid crawl, the reference CLI creates an encrypted
+                dedicated Celo wallet file and reuses it later. An agent runtime
+                can keep the same wallet in its own secure store. If an approved
+                request needs funds, it asks for a bounded Celo USDC top-up to
+                that wallet. Do not paste a private key or send USDC directly to
+                a publisher.
               </p>
               <h3>Ask the agent</h3>
               <CodeBlock>{`Use PayCrawl to crawl ${gatewayUrl}/agent/page/article-1.

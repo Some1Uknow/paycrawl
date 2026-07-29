@@ -69,6 +69,7 @@ describe("network retry policy", () => {
       privateKey: payerKey,
       payoutAllowlist: new Set([payTo.toLowerCase()]),
       budget: new SpendBudget(10_000n, 10_000n),
+      usdcBalanceOf: async () => 10_000n,
       fetchImpl,
     });
 
@@ -94,6 +95,7 @@ describe("network retry policy", () => {
         privateKey: payerKey,
         payoutAllowlist: new Set([payTo.toLowerCase()]),
         budget: new SpendBudget(10_000n, 10_000n),
+        usdcBalanceOf: async () => 10_000n,
         fetchImpl,
       }),
     ).rejects.toThrow(/not retried/);
