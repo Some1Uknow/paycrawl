@@ -96,9 +96,13 @@ browser wallet.
 
 For a self-hosted macOS agent, invoke the local PayCrawl CLI directly. It
 provisions the Keychain secret, encrypted wallet, and publisher-policy file as
-needed. On the first unknown publisher, run the unpaid request, show the
-validated origin, payout address, and quoted amount, and ask for approval. Only
-after a clear approval, rerun that one target with `--approve-publisher`.
+needed. From a PayCrawl repository workspace, use:
+
+    pnpm crawl --url <protected-url> --max-requests 1 --max-total-usdc <limit> --max-per-request-usdc <limit> --concurrency 1
+
+On the first unknown publisher, run that unpaid request, show the validated
+origin, payout address, and quoted amount, and ask for approval. Only after a
+clear approval, rerun that one target with `--approve-publisher`.
 
 If the balance is insufficient, give the user only the persistent payer wallet
 address, `Celo mainnet`, and one bounded Celo-USDC funding amount. For example:
