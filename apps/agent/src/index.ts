@@ -6,6 +6,7 @@ import { Command } from "commander";
 import { SpendBudget, formatUsdc, parseUsdc } from "./budget.js";
 import { crawlOne, formatResult } from "./crawl.js";
 import { parsePayToAllowlist } from "./payment.js";
+import { loadPublisherPolicy } from "./publisher-policy.js";
 import { loadOrCreatePayerWallet } from "./wallet.js";
 
 type CommandOptions = {
@@ -15,6 +16,7 @@ type CommandOptions = {
   maxPerRequestUsdc?: string;
   concurrency: string;
   maxResponseBytes: string;
+  approvePublisher?: boolean;
 };
 
 function collect(value: string, previous: string[]): string[] {
@@ -44,14 +46,20 @@ async function run(options: CommandOptions): Promise<void> {
   if (targets.length === 0) {
     throw new Error("At least one --url is required");
   }
+  if (options.approvePublisher && targets.length !== 1) {
+    throw new Error(
+      "--approve-publisher accepts one target at a time so the approval terms stay explicit",
+    );
+  }
 
   const budget = new SpendBudget(totalLimit, perRequestLimit);
   const wallet = await loadOrCreatePayerWallet();
-  const payoutAllowlist = parsePayToAllowlist(
-    process.env.PAYCRAWL_ALLOWED_PAY_TO,
-  );
+  const publisherPolicy = await loadPublisherPolicy();
+  const hardPayoutRestriction = process.env.PAYCRAWL_ALLOWED_PAY_TO
+    ? parsePayToAllowlist(process.env.PAYCRAWL_ALLOWED_PAY_TO)
+    : undefined;
   process.stderr.write(
-    `PayCrawl: ${targets.length} target(s), concurrency ${concurrency}, total budget ${formatUsdc(totalLimit)} USDC, per-request cap ${formatUsdc(perRequestLimit)} USDC\nPayer wallet: ${wallet.address}\nWallet file: ${wallet.filePath}\n`,
+    `PayCrawl: ${targets.length} target(s), concurrency ${concurrency}, total budget ${formatUsdc(totalLimit)} USDC, per-request cap ${formatUsdc(perRequestLimit)} USDC\nPayer wallet: ${wallet.address}\nWallet file: ${wallet.filePath}\nPublisher policy: ${publisherPolicy.filePath}\n`,
   );
 
   let cursor = 0;
@@ -73,7 +81,33 @@ async function run(options: CommandOptions): Promise<void> {
           const result = await crawlOne({
             url: target,
             privateKey: wallet.privateKey,
-            payoutAllowlist,
+            resolvePayoutAllowlist: async (quote) => {
+              const payTo = quote.requirements.payTo.toLowerCase();
+              if (hardPayoutRestriction && !hardPayoutRestriction.has(payTo)) {
+                throw new Error(
+                  `Publisher payout ${quote.requirements.payTo} is outside PAYCRAWL_ALLOWED_PAY_TO`,
+                );
+              }
+
+              const requestedUrl = new URL(target);
+              if (publisherPolicy.isApproved(requestedUrl, quote)) {
+                return new Set([payTo]);
+              }
+              if (!options.approvePublisher) {
+                throw new Error(
+                  `Publisher approval required: ${requestedUrl.origin} proposes ${formatUsdc(quote.amountAtomic)} Celo USDC to ${quote.requirements.payTo}. Review the quote, then rerun this one target with --approve-publisher`,
+                );
+              }
+
+              const approval = await publisherPolicy.approve(
+                requestedUrl,
+                quote,
+              );
+              process.stderr.write(
+                `Approved publisher: ${approval.origin} → ${approval.payTo} (Celo USDC)\n`,
+              );
+              return new Set([payTo]);
+            },
             budget,
             maxResponseBytes,
           });
@@ -118,6 +152,10 @@ program
     "--max-response-bytes <bytes>",
     "maximum content bytes accepted from a publisher",
     "2097152",
+  )
+  .option(
+    "--approve-publisher",
+    "persist approval for the validated publisher quoted by this one target",
   )
   .action(async (options: CommandOptions) => {
     await run(options);

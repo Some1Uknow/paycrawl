@@ -4,6 +4,7 @@ import type { PaymentRequired } from "@x402/fetch";
 
 import { SpendBudget } from "../src/budget.js";
 import {
+  inspectPaymentRequired,
   parsePayToAllowlist,
   validateAndReservePayment,
   validatePaymentRequired,
@@ -40,8 +41,14 @@ describe("payment challenge policy", () => {
       "0x1111111111111111111111111111111111111111",
     );
     expect(() => validatePaymentRequired(challenge, url, allowlist)).toThrow(
-      /approved Celo USDC/,
+      /not approved by the local policy/,
     );
+  });
+
+  it("inspects strict quote terms before publisher approval", () => {
+    const quote = inspectPaymentRequired(challenge, url);
+    expect(quote.requirements.payTo).toBe(payTo);
+    expect(quote.amountAtomic).toBe(1000n);
   });
 
   it("rejects the zero address in a local payout allowlist", () => {

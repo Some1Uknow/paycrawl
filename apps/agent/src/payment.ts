@@ -12,6 +12,11 @@ function normalizeAddress(address: string): string {
   return address.toLowerCase();
 }
 
+/**
+ * Optional hard restriction for deployments that want to permit only a known
+ * set of payout wallets. Normal agent use relies on the persistent publisher
+ * policy instead; this is an extra guard, not the primary UX.
+ */
 export function parsePayToAllowlist(raw: string | undefined): Set<string> {
   const values =
     raw
@@ -21,7 +26,7 @@ export function parsePayToAllowlist(raw: string | undefined): Set<string> {
 
   if (values.length === 0) {
     throw new Error(
-      "PAYCRAWL_ALLOWED_PAY_TO must contain at least one payout address",
+      "PAYCRAWL_ALLOWED_PAY_TO must contain at least one payout address when set",
     );
   }
 
@@ -37,17 +42,14 @@ export function parsePayToAllowlist(raw: string | undefined): Set<string> {
   return allowlist;
 }
 
-function isExpectedRequirement(
-  requirement: PaymentRequirements,
-  allowlist: Set<string>,
-): boolean {
+function isExpectedRequirement(requirement: PaymentRequirements): boolean {
   return (
     requirement.scheme === "exact" &&
     requirement.network === CELO_NETWORK &&
     requirement.asset.toLowerCase() === CELO_USDC.toLowerCase() &&
     requirement.extra.name === "USDC" &&
     requirement.extra.version === "2" &&
-    allowlist.has(normalizeAddress(requirement.payTo))
+    isEvmAddress(requirement.payTo)
   );
 }
 
@@ -67,11 +69,14 @@ function assertExpectedResource(
   }
 }
 
-/** Decode a 402 and reject every payment term outside the configured policy. */
-export function validatePaymentRequired(
+/**
+ * Decode the protocol terms which are invariant for every PayCrawl payer.
+ * Publisher approval deliberately happens after this step so an agent can
+ * present the exact, validated payout terms before it persists consent.
+ */
+export function inspectPaymentRequired(
   paymentRequired: PaymentRequired,
   requestedUrl: URL,
-  payoutAllowlist: Set<string>,
 ): ValidatedQuote {
   if (paymentRequired.x402Version !== 2) {
     throw new Error("Only x402 v2 payments are accepted");
@@ -79,14 +84,14 @@ export function validatePaymentRequired(
 
   assertExpectedResource(paymentRequired, requestedUrl);
   const allowed = paymentRequired.accepts.filter((requirement) =>
-    isExpectedRequirement(requirement, payoutAllowlist),
+    isExpectedRequirement(requirement),
   );
 
   // A single unambiguous Celo USDC option is required. This avoids silently
   // selecting an unexpected payment route from a multi-option challenge.
   if (allowed.length !== 1) {
     throw new Error(
-      "402 challenge does not contain exactly one approved Celo USDC payment option",
+      "402 challenge does not contain exactly one Celo USDC payment option",
     );
   }
 
@@ -96,6 +101,19 @@ export function validatePaymentRequired(
   }
 
   return { requirements, amountAtomic: parseUsdcAtomic(requirements.amount) };
+}
+
+/** Decode a 402 and reject every payment term outside the approved policy. */
+export function validatePaymentRequired(
+  paymentRequired: PaymentRequired,
+  requestedUrl: URL,
+  payoutAllowlist: Set<string>,
+): ValidatedQuote {
+  const quote = inspectPaymentRequired(paymentRequired, requestedUrl);
+  if (!payoutAllowlist.has(normalizeAddress(quote.requirements.payTo))) {
+    throw new Error("402 payout address is not approved by the local policy");
+  }
+  return quote;
 }
 
 function parseUsdcAtomic(amount: string): bigint {

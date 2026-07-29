@@ -123,7 +123,10 @@ The CLI below is a reference integration for agent-runtime developers. On its
 first paid crawl, it creates an encrypted Celo wallet file at
 `~/.paycrawl/wallets/payer-eip155-42220.json` and reuses it on later crawls.
 The wallet passphrase must come from the agent runtime's secret store. The raw
-private key is never written to the file or printed.
+private key is never written to the file or printed. It also keeps explicit
+publisher approvals in `~/.paycrawl/policies/publishers-eip155-42220.json`.
+That local policy binds an HTTPS publisher origin to its Celo-USDC payout
+address; it stores no key material.
 
 ```bash
 pnpm crawl \
@@ -133,9 +136,31 @@ pnpm crawl \
   --concurrency 1
 ```
 
-For a stricter per-request policy, add `--max-per-request-usdc 0.001`.
+For a new publisher, the CLI stops after the unsigned quote and shows the
+origin, payout address, and price. After the operator or agent runtime has
+reviewed those terms, approve that single target once:
 
-Before signing, the CLI decodes the actual 402 and requires exactly one approved payment option: x402 v2, Celo mainnet, the expected native USDC contract, USDC v2 metadata, and a locally configured `payTo`. It reserves the quote against the total budget before signing. It retries only unsigned challenge network requests; a signed request with an ambiguous network result is deliberately not retried.
+```bash
+pnpm crawl \
+  --url https://gateway.example/agent/page/article-1 \
+  --max-requests 1 \
+  --max-total-usdc 0.001 \
+  --approve-publisher
+```
+
+Later crawls from that origin to that payout wallet run automatically within
+their request and spend limits. A publisher that changes its payout wallet
+requires a new approval. For a stricter managed deployment, set the optional
+`PAYCRAWL_ALLOWED_PAY_TO` environment variable as an additional hard
+restriction. For a stricter per-request policy, add
+`--max-per-request-usdc 0.001`.
+
+Before signing, the CLI decodes the actual 402 and requires exactly one
+approved payment option: x402 v2, Celo mainnet, the expected native USDC
+contract, USDC v2 metadata, and a locally approved origin/payout pair. It
+reserves the quote against the total budget before signing. It retries only
+unsigned challenge network requests; a signed request with an ambiguous network
+result is deliberately not retried.
 
 ## Agent skill
 
@@ -151,7 +176,9 @@ Install it in a skill-aware agent project:
 The runtime must provide secure wallet custody, durable wallet-handle storage,
 balance lookup, and signing. The skill defines the wallet lifecycle and funding
 prompt. A self-hosted CLI may use the encrypted wallet file described above;
-the passphrase remains a runtime secret and is never sent to PayCrawl.
+the passphrase remains a runtime secret and is never sent to PayCrawl. The
+skill asks for explicit approval only for an unknown publisher origin or a new
+payout address, then persists that local policy for later requests.
 
 ## Web console
 

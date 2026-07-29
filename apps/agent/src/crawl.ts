@@ -12,8 +12,10 @@ import { celo } from "viem/chains";
 
 import { formatUsdc, type SpendBudget } from "./budget.js";
 import {
+  inspectPaymentRequired,
   validateAndReservePayment,
   validatePaymentRequired,
+  type ValidatedQuote,
 } from "./payment.js";
 
 const MAX_SAFE_NETWORK_RETRIES = 2;
@@ -30,7 +32,14 @@ export type CrawlTargetResult = {
 export type CrawlOptions = {
   url: string;
   privateKey: `0x${string}`;
-  payoutAllowlist: Set<string>;
+  /**
+   * Legacy static restriction. Prefer resolvePayoutAllowlist so new publishers
+   * can be explicitly approved and stored by the caller's local policy.
+   */
+  payoutAllowlist?: Set<string>;
+  resolvePayoutAllowlist?: (
+    quote: ValidatedQuote,
+  ) => Promise<Set<string>> | Set<string>;
   budget: SpendBudget;
   fetchImpl?: typeof fetch;
   timeoutMs?: number;
@@ -246,6 +255,21 @@ function decodeChallenge(
   }
 }
 
+async function resolvePayoutAllowlist(
+  options: CrawlOptions,
+  quote: ValidatedQuote,
+): Promise<Set<string>> {
+  const resolved = options.resolvePayoutAllowlist
+    ? await options.resolvePayoutAllowlist(quote)
+    : options.payoutAllowlist;
+  if (!resolved || resolved.size === 0) {
+    throw new Error(
+      "No publisher approval is available for this 402 quote. Review the publisher and approve it before signing",
+    );
+  }
+  return resolved;
+}
+
 export async function crawlOne(
   options: CrawlOptions,
 ): Promise<CrawlTargetResult> {
@@ -273,31 +297,23 @@ export async function crawlOne(
     };
   }
 
-  const account = privateKeyToAccount(options.privateKey);
-  const client = new x402Client((_version, requirements) => {
-    const challenge: PaymentRequired = {
-      x402Version: 2,
-      resource: { url: url.toString() },
-      accepts: requirements,
-    };
-    return validatePaymentRequired(challenge, url, options.payoutAllowlist)
-      .requirements;
-  }).register(CELO_NETWORK, new ExactEvmScheme(account));
-  const httpClient = new x402HTTPClient(client);
-
   // Validate the exact challenge shown to the agent before it can sign. The
   // same policy is registered below as a pre-sign hook because the wrapper
   // performs its own fresh unpaid request before sending PAYMENT-SIGNATURE.
+  const account = privateKeyToAccount(options.privateKey);
+  const httpClient = new x402HTTPClient(new x402Client());
   let preflightChallenge: PaymentRequired;
   try {
     preflightChallenge = decodeChallenge(initial, httpClient);
   } finally {
     await initial.body?.cancel().catch(() => undefined);
   }
+  const inspectedQuote = inspectPaymentRequired(preflightChallenge, url);
+  const payoutAllowlist = await resolvePayoutAllowlist(options, inspectedQuote);
   const validatedQuote = validatePaymentRequired(
     preflightChallenge,
     url,
-    options.payoutAllowlist,
+    payoutAllowlist,
   );
   const balanceOf = options.usdcBalanceOf ?? readCeloUsdcBalance;
   const balance = await balanceOf(account.address);
@@ -307,11 +323,22 @@ export async function crawlOne(
     );
   }
 
+  const client = new x402Client((_version, requirements) => {
+    const challenge: PaymentRequired = {
+      x402Version: 2,
+      resource: { url: url.toString() },
+      accepts: requirements,
+    };
+    return validatePaymentRequired(challenge, url, payoutAllowlist)
+      .requirements;
+  }).register(CELO_NETWORK, new ExactEvmScheme(account));
+  const paidHttpClient = new x402HTTPClient(client);
+
   client.onBeforePaymentCreation(async ({ paymentRequired }) => {
     validateAndReservePayment(
       paymentRequired,
       url,
-      options.payoutAllowlist,
+      payoutAllowlist,
       options.budget,
     );
   });
@@ -325,7 +352,7 @@ export async function crawlOne(
       ? fetchWithTimeout(request, {}, fetchImpl, timeoutMs)
       : retryUnsignedRequest(request, fetchImpl, timeoutMs);
   };
-  const paidFetch = wrapFetchWithPayment(retrySafeFetch, httpClient);
+  const paidFetch = wrapFetchWithPayment(retrySafeFetch, paidHttpClient);
   let response: Response;
   try {
     response = await paidFetch(url, { method: "GET", redirect: "error" });
@@ -340,7 +367,7 @@ export async function crawlOne(
   let receipt: unknown;
   const receiptHeader = response.headers.get("payment-response");
   if (receiptHeader) {
-    receipt = httpClient.getPaymentSettleResponse((name) =>
+    receipt = paidHttpClient.getPaymentSettleResponse((name) =>
       response.headers.get(name),
     );
   }

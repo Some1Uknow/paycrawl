@@ -50,6 +50,46 @@ function paidResponse(): Response {
 }
 
 describe("network retry policy", () => {
+  it("resolves a validated quote through the caller's publisher policy", async () => {
+    let quotedPayTo: string | undefined;
+    const result = await crawlOne({
+      url,
+      privateKey: payerKey,
+      resolvePayoutAllowlist: (quote) => {
+        quotedPayTo = quote.requirements.payTo;
+        return new Set([quote.requirements.payTo.toLowerCase()]);
+      },
+      budget: new SpendBudget(10_000n, 10_000n),
+      usdcBalanceOf: async () => 10_000n,
+      fetchImpl: async (input, init) => {
+        const request = new Request(input, init);
+        return request.headers.has("payment-signature")
+          ? paidResponse()
+          : unpaidResponse();
+      },
+    });
+
+    expect(result.status).toBe(200);
+    expect(quotedPayTo).toBe(payTo);
+  });
+
+  it("requires publisher approval before checking a wallet balance", async () => {
+    let balanceChecks = 0;
+    await expect(
+      crawlOne({
+        url,
+        privateKey: payerKey,
+        budget: new SpendBudget(10_000n, 10_000n),
+        usdcBalanceOf: async () => {
+          balanceChecks += 1;
+          return 10_000n;
+        },
+        fetchImpl: async () => unpaidResponse(),
+      }),
+    ).rejects.toThrow(/No publisher approval/);
+    expect(balanceChecks).toBe(0);
+  });
+
   it("retries an unsigned challenge network error but not the signed request", async () => {
     let unsignedCalls = 0;
     let signedCalls = 0;

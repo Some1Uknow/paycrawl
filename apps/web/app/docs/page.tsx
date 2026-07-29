@@ -34,7 +34,7 @@ export default function DocsPage(): React.ReactElement {
 
       <MotionReveal className="motion-section">
         <header className="reference-header" data-reveal>
-          <p className="eyebrow">Documentation / Public beta</p>
+          <p className="eyebrow">Documentation</p>
           <h1>PayCrawl</h1>
           <p>
             An x402 gateway for paid machine-readable content on Celo. Agents
@@ -119,7 +119,7 @@ export default function DocsPage(): React.ReactElement {
             </section>
 
             <section id="agent">
-              <h2>Install once. Let the runtime manage the wallet.</h2>
+              <h2>Give the agent a limit. It handles the payment flow.</h2>
               <h3>Install the skill</h3>
               <p>
                 Add the PayCrawl workflow skill to the agent project. It handles
@@ -130,11 +130,13 @@ export default function DocsPage(): React.ReactElement {
                   "npx skills add Some1Uknow/paycrawl --skill paycrawl --agent '*' --yes --full-depth"
                 }
               </CodeBlock>
-              <h3>Set the policy</h3>
+              <h3>Approve a publisher once</h3>
               <p>
-                Set approved publisher addresses, a per-request ceiling, a total
-                budget, and a request limit. The skill rejects a quote outside
-                that policy.
+                Set a per-request ceiling, a total budget, and a request limit.
+                For an unknown publisher, the agent shows the origin, payout
+                address, and price before it pays. After approval, it keeps that
+                origin and payout pair in its local policy. A changed payout
+                address requires approval again.
               </p>
               <h3>Fund only when asked</h3>
               <p>
@@ -147,8 +149,9 @@ export default function DocsPage(): React.ReactElement {
               </p>
               <h3>Ask the agent</h3>
               <CodeBlock>{`Use PayCrawl to crawl ${gatewayUrl}/agent/page/article-1.
-Allow only Celo USDC. Do not spend more than 0.001 USDC on this request
-or more than 0.01 USDC in total. Return the PAYMENT-RESPONSE receipt.`}</CodeBlock>
+Use only Celo USDC. Ask me before approving a new publisher. Do not spend
+more than 0.001 USDC on this request or 0.01 USDC in total. Return the
+content and PAYMENT-RESPONSE receipt.`}</CodeBlock>
             </section>
 
             <section id="publisher">
@@ -227,10 +230,12 @@ or more than 0.01 USDC in total. Return the PAYMENT-RESPONSE receipt.`}</CodeBlo
             </section>
 
             <section id="limits">
-              <h2>Current limits</h2>
+              <h2>Current scope</h2>
               <ul>
                 <li>Publisher deployment requires a Cloudflare account.</li>
-                <li>The agent client is not a published package yet.</li>
+                <li>
+                  An agent wallet needs Celo USDC before its first payment.
+                </li>
                 <li>The website does not hold wallet keys or funds.</li>
               </ul>
             </section>
