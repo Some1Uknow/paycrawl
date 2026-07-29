@@ -21,12 +21,10 @@ export default function Home(): React.ReactElement {
       <MotionReveal className="motion-section">
         <section className="hero landing-hero" id="top">
           <div className="hero-copy" data-reveal>
-            <h1>Paid content. An ordinary request.</h1>
+            <h1>AI agents pay for content.</h1>
             <p className="hero-lede">
-              PayCrawl lets agents buy machine-readable content in one HTTP
-              flow. Publishers set the price. The agent validates the quote,
-              signs from its own wallet, and receives a receipt with the
-              response.
+              Publishers set a price. Agents check it, pay from their own
+              wallet, and get the content.
             </p>
             <div className="hero-actions">
               <a className="button button-primary" href="/docs#agent">
