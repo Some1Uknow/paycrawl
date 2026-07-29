@@ -1,5 +1,6 @@
 "use client";
 
+import { toDataSuffix } from "@celo/attribution-tags";
 import { useState } from "react";
 
 const chainId = "0xa4ec";
@@ -8,6 +9,8 @@ const identityRegistry = "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432";
 const agentUri = "https://paycrawl.vercel.app/.well-known/paycrawl-agent.json";
 const registerData =
   "0xf2c298be0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003b68747470733a2f2f706179637261776c2e76657263656c2e6170702f2e77656c6c2d6b6e6f776e2f706179637261776c2d6167656e742e6a736f6e0000000000";
+const attributionTag = "celo_468e1efe7287";
+const transactionData = `${registerData}${toDataSuffix(attributionTag).slice(2)}`;
 
 type Provider = {
   request(args: { method: string; params?: unknown[] }): Promise<unknown>;
@@ -74,7 +77,7 @@ export default function RegisterAgentPage(): React.ReactElement {
           {
             from: account,
             to: identityRegistry,
-            data: registerData,
+            data: transactionData,
             value: "0x0",
           },
         ],
@@ -119,6 +122,10 @@ export default function RegisterAgentPage(): React.ReactElement {
           <div>
             <dt>Metadata</dt>
             <dd>{agentUri}</dd>
+          </div>
+          <div>
+            <dt>Attribution</dt>
+            <dd>{attributionTag}</dd>
           </div>
         </dl>
         <button

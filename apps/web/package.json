@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@celo/attribution-tags": "^0.3.0",
     "@paycrawl/shared": "workspace:*",
     "next": "^15.4.5",
     "react": "^19.1.0",
