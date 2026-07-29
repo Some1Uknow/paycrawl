@@ -527,23 +527,6 @@ code,
   line-height: 1.5;
 }
 
-.chat-message [data-typing]::after {
-  display: inline-block;
-  width: 1px;
-  height: 1em;
-  margin-left: 2px;
-  vertical-align: -0.16em;
-  background: var(--signal);
-  animation: chat-caret 760ms steps(1) infinite;
-  content: "";
-}
-
-@keyframes chat-caret {
-  50% {
-    opacity: 0;
-  }
-}
-
 .chat-link {
   display: block;
   margin-top: 9px;
@@ -1550,7 +1533,4 @@ td code {
     animation-play-state: paused;
   }
 
-  .chat-message [data-typing]::after {
-    display: none;
-  }
 }
