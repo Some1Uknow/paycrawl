@@ -73,12 +73,17 @@ export default function RegisterAgentPage(): React.ReactElement {
       const account = Array.isArray(accounts) ? accounts[0] : undefined;
       if (
         typeof account !== "string" ||
-        account.toLowerCase() !== expectedOwner
+        account.toLowerCase() !== expectedOwner.toLowerCase()
       ) {
         throw new Error(
-          "Connect the wallet recorded in PayCrawl’s registration metadata.",
+          `Switch MetaMask to ${expectedOwner}. The selected account is ${
+            typeof account === "string" ? account : "unavailable"
+          }.`,
         );
       }
+      setStatus(
+        `Connected ${account}. Preparing the Celo mainnet transaction…`,
+      );
       await switchToCelo(wallet);
       setStatus("Confirm the ERC-8004 identity registration in your wallet…");
       const hash = await wallet.request({
