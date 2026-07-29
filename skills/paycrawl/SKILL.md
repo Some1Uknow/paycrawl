@@ -39,7 +39,7 @@ credential is attached to the HTTP request. Do not use a browser checkout flow.
 7. Return the content and the decoded receipt. Record the transaction hash when
    available.
 
-For the public beta gateway, start with:
+For the hosted gateway, start with:
 
     curl --include https://paycrawl-gateway.raghu250407.workers.dev/.well-known/paycrawl.json
     curl --include https://paycrawl-gateway.raghu250407.workers.dev/agent/page/article-1

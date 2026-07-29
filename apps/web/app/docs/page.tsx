@@ -65,7 +65,7 @@ export default function DocsPage(): React.ReactElement {
             <a href="#agent">Agent setup</a>
             <a href="#publisher">Publisher setup</a>
             <a href="#endpoints">API reference</a>
-            <a href="#limits">Beta limits</a>
+            <a href="#limits">Scope</a>
           </aside>
 
           <article className="reference-content">
