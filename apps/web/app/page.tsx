@@ -1,4 +1,5 @@
 import { LiveMetrics } from "../components/live-metrics";
+import { HeroChat } from "../components/hero-chat";
 import { MotionReveal, PinnedGallery } from "../components/motion";
 import { SiteFooter, SiteNav } from "../components/site-chrome";
 
@@ -39,46 +40,7 @@ export default function Home(): React.ReactElement {
             </p>
           </div>
 
-          <div
-            className="protocol-panel"
-            aria-label="PayCrawl payment sequence"
-            data-motion-media
-            data-reveal
-          >
-            <div className="panel-topline">
-              <span>Request flow</span>
-              <span>Celo mainnet</span>
-            </div>
-            <ol className="protocol-steps">
-              <li>
-                <span className="step-index">01</span>
-                <div>
-                  <strong>Request</strong>
-                  <p>Agent asks for a protected route.</p>
-                </div>
-                <code>GET /agent/page/*</code>
-              </li>
-              <li>
-                <span className="step-index">02</span>
-                <div>
-                  <strong>Quote</strong>
-                  <p>Gateway returns price and payout details.</p>
-                </div>
-                <code>402 PAYMENT REQUIRED</code>
-              </li>
-              <li>
-                <span className="step-index">03</span>
-                <div>
-                  <strong>Pay and read</strong>
-                  <p>Agent signs the approved quote and retries.</p>
-                </div>
-                <code>PAYMENT-RESPONSE</code>
-              </li>
-            </ol>
-            <div className="panel-rule">
-              Settlement occurs only after successful origin delivery.
-            </div>
-          </div>
+          <HeroChat />
         </section>
       </MotionReveal>
 
