@@ -1,3 +1,4 @@
+import { MotionReveal } from "../../components/motion";
 import { SiteFooter, SiteNav } from "../../components/site-chrome";
 
 const agentId = "9746";
@@ -10,7 +11,7 @@ const registrationTx =
 
 export default function RegisterAgentPage(): React.ReactElement {
   return (
-    <main className="registration-page" id="main-content">
+    <main className="registration-page site-shell" id="main-content">
       <SiteNav
         links={[
           { href: "/#how-it-works", label: "How it works" },
@@ -20,58 +21,60 @@ export default function RegisterAgentPage(): React.ReactElement {
         action={{ href: "/docs", label: "Read the docs" }}
       />
 
-      <section className="registration-card">
-        <div className="registration-state">
-          <span className="signal" aria-hidden="true" />
-          Registered on Celo mainnet
-        </div>
-        <p className="eyebrow">ERC-8004 identity</p>
-        <h1>PayCrawl has a registered agent identity.</h1>
-        <p>
-          The identity is complete. This page is a public record and cannot
-          submit another registration transaction.
-        </p>
-        <dl>
-          <div>
-            <dt>Agent ID</dt>
-            <dd>{agentId}</dd>
+      <MotionReveal className="motion-section">
+        <section className="registration-card" data-reveal>
+          <div className="registration-state">
+            <span className="signal" aria-hidden="true" />
+            Registered on Celo mainnet
           </div>
-          <div>
-            <dt>Owner</dt>
-            <dd>{owner}</dd>
+          <p className="eyebrow">ERC-8004 identity</p>
+          <h1>PayCrawl has a registered agent identity.</h1>
+          <p>
+            The identity is complete. This page is a public record and cannot
+            submit another registration transaction.
+          </p>
+          <dl>
+            <div>
+              <dt>Agent ID</dt>
+              <dd>{agentId}</dd>
+            </div>
+            <div>
+              <dt>Owner</dt>
+              <dd>{owner}</dd>
+            </div>
+            <div>
+              <dt>Registry</dt>
+              <dd>{identityRegistry}</dd>
+            </div>
+            <div>
+              <dt>Metadata</dt>
+              <dd>{agentUri}</dd>
+            </div>
+            <div>
+              <dt>Attribution</dt>
+              <dd>{attributionTag}</dd>
+            </div>
+          </dl>
+          <div className="registration-actions">
+            <a
+              className="button button-primary"
+              href={`https://8004scan.io/agents/celo/${agentId}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              View agent identity <span aria-hidden="true">↗</span>
+            </a>
+            <a
+              className="text-link"
+              href={`https://celoscan.io/tx/${registrationTx}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              View registration transaction <span aria-hidden="true">↗</span>
+            </a>
           </div>
-          <div>
-            <dt>Registry</dt>
-            <dd>{identityRegistry}</dd>
-          </div>
-          <div>
-            <dt>Metadata</dt>
-            <dd>{agentUri}</dd>
-          </div>
-          <div>
-            <dt>Attribution</dt>
-            <dd>{attributionTag}</dd>
-          </div>
-        </dl>
-        <div className="registration-actions">
-          <a
-            className="button button-primary"
-            href={`https://8004scan.io/agents/celo/${agentId}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            View agent identity <span aria-hidden="true">↗</span>
-          </a>
-          <a
-            className="text-link"
-            href={`https://celoscan.io/tx/${registrationTx}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            View registration transaction <span aria-hidden="true">↗</span>
-          </a>
-        </div>
-      </section>
+        </section>
+      </MotionReveal>
 
       <SiteFooter />
     </main>
