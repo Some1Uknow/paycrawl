@@ -1,4 +1,5 @@
 import { LiveMetrics } from "../components/live-metrics";
+import { PayWithCelo } from "../components/pay-with-celo";
 
 export const revalidate = 300;
 
@@ -32,6 +33,7 @@ export default function Home(): React.ReactElement {
         </a>
         <div className="nav-links">
           <a href="#how-it-works">How it works</a>
+          <a href="#try">Try it</a>
           <a href="#live">Live ledger</a>
         </div>
         <a className="nav-cta" href="/docs">
@@ -54,10 +56,10 @@ export default function Home(): React.ReactElement {
           </p>
           <div className="hero-actions">
             <a className="button button-primary" href="/docs#agents">
-              I&apos;m an agent <span>↗</span>
+              Agent setup <span>↗</span>
             </a>
-            <a className="button button-quiet" href="/docs#publishers">
-              I&apos;m a publisher <span>↗</span>
+            <a className="button button-quiet" href="#try">
+              Try with a wallet <span>↓</span>
             </a>
           </div>
           <p className="microcopy">
@@ -131,6 +133,8 @@ export default function Home(): React.ReactElement {
           Inspect the live 402 challenge <span>↗</span>
         </a>
       </section>
+
+      <PayWithCelo />
 
       <section id="live" className="live-wrap">
         <LiveMetrics />

@@ -91,7 +91,16 @@ export default function DocsPage(): React.ReactElement {
         <article className="reference-content">
           <section id="overview">
             <h2>Overview</h2>
-            <p>Use this sequence to access a paid route.</p>
+            <p>
+              To use the live route from a browser wallet, open the{" "}
+              <Link href="/#try">checkout</Link>. It shows the price, enforces a
+              per-request cap, and asks the wallet to sign only the displayed
+              Celo USDC authorization.
+            </p>
+            <p>
+              For an agent integration, use this sequence to access a paid
+              route.
+            </p>
             <ol>
               <li>
                 <span>Send a request to the route.</span>

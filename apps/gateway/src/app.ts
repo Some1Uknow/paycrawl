@@ -51,6 +51,28 @@ export type GatewayDependencies = {
 const HEALTH_CACHE_TTL_SECONDS = 15;
 const STATS_CACHE_TTL_SECONDS = 15;
 const publicEndpointInFlight = new Map<string, Promise<Response>>();
+const BETA_WEB_ORIGIN = "https://paycrawl.vercel.app";
+
+/**
+ * The public beta can make a paid request from its own origin. Payment headers
+ * are deliberately exposed only to that origin; the gateway does not rely on
+ * browser cookies or credentials for authorization.
+ */
+function applyBetaBrowserCors(request: Request, headers: Headers): void {
+  if (request.headers.get("Origin") !== BETA_WEB_ORIGIN) return;
+
+  headers.set("Access-Control-Allow-Origin", BETA_WEB_ORIGIN);
+  headers.set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+  headers.set("Access-Control-Allow-Headers", "payment-signature, x-payment");
+  headers.set(
+    "Access-Control-Expose-Headers",
+    "payment-required, payment-response",
+  );
+  headers.set("Vary", "Origin");
+  // The default resource policy is right for machine clients. A browser page
+  // on our product origin needs to read the response after payment settles.
+  headers.set("Cross-Origin-Resource-Policy", "cross-origin");
+}
 
 function matchingRoute(
   pathname: string,
@@ -263,9 +285,14 @@ export function createGateway(
   // 402 and settlement-failure responses from intermediary caching.
   app.use("/agent/*", async (context, next) => {
     context.set("requestStartedAt", Date.now());
+    if (context.req.method === "OPTIONS") {
+      applyBetaBrowserCors(context.req.raw, context.res.headers);
+      return context.body(null, 204);
+    }
     await next();
     context.res.headers.delete(INTERNAL_LATENCY_HEADER);
     noStore(context.res);
+    applyBetaBrowserCors(context.req.raw, context.res.headers);
   });
 
   // x402/Hono handles the strict v2 challenge, verification, cancellation when

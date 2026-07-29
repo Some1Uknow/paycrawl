@@ -154,6 +154,40 @@ function signedHeaders(accepted: PaymentRequirements): Headers {
 }
 
 describe("x402 gateway protocol", () => {
+  it("allows the product origin to read and submit payment headers", async () => {
+    const harness = makeHarness();
+    const preflight = await harness.app.request(
+      "https://gateway.example/agent/page/article-1",
+      {
+        method: "OPTIONS",
+        headers: { Origin: "https://paycrawl.vercel.app" },
+      },
+    );
+    const challenge = await harness.app.request(
+      "https://gateway.example/agent/page/article-1",
+      { headers: { Origin: "https://paycrawl.vercel.app" } },
+    );
+    const otherOrigin = await harness.app.request(
+      "https://gateway.example/agent/page/article-1",
+      { headers: { Origin: "https://untrusted.example" } },
+    );
+
+    expect(preflight.status).toBe(204);
+    expect(preflight.headers.get("access-control-allow-origin")).toBe(
+      "https://paycrawl.vercel.app",
+    );
+    expect(preflight.headers.get("access-control-allow-headers")).toContain(
+      "payment-signature",
+    );
+    expect(challenge.headers.get("access-control-expose-headers")).toContain(
+      "payment-response",
+    );
+    expect(challenge.headers.get("cross-origin-resource-policy")).toBe(
+      "cross-origin",
+    );
+    expect(otherOrigin.headers.get("access-control-allow-origin")).toBeNull();
+  });
+
   it("permits content-free HEAD and rejects other protected-route methods", async () => {
     const harness = makeHarness();
     const head = await harness.app.request(
