@@ -18,7 +18,7 @@ function formatUsdc(amountAtomic: string): string {
       .replace(/0+$/, "");
     return `${whole}${fraction ? `.${fraction}` : ""}`;
   } catch {
-    return "—";
+    return "Unavailable";
   }
 }
 
@@ -84,9 +84,17 @@ export function LiveMetrics(): React.ReactElement {
             {state.status === "loading" ? "connecting" : "gateway unavailable"}
           </span>
         </div>
+        {state.status === "loading" ? (
+          <div className="metric-grid metric-grid-skeleton" aria-hidden="true">
+            <div className="metric" />
+            <div className="metric" />
+            <div className="metric" />
+            <div className="metric" />
+          </div>
+        ) : null}
         <p className="console-empty">
           {state.status === "loading"
-            ? "Connecting to the publisher gateway…"
+            ? "Connecting to the publisher gateway."
             : `${state.error}. Set PAYCRAWL_GATEWAY_URL to enable verified gateway analytics.`}
         </p>
       </section>
@@ -101,7 +109,7 @@ export function LiveMetrics(): React.ReactElement {
           <p className="eyebrow">Settlement telemetry</p>
           <h2 id="live-console-heading">The receipt ledger</h2>
         </div>
-        <span className="status-chip">gateway analytics · 30s refresh</span>
+        <span className="status-chip">gateway analytics / 30 second refresh</span>
       </div>
 
       <div className="metric-grid">
@@ -124,8 +132,8 @@ export function LiveMetrics(): React.ReactElement {
       </div>
 
       <p className="console-empty" aria-live="polite">
-        Generated {formatTimestamp(metrics.generatedAt)} · Last settlement{" "}
-        {formatTimestamp(metrics.lastSettlementAt)} · Aggregates retain at most{" "}
+        Generated {formatTimestamp(metrics.generatedAt)}. Last settlement{" "}
+        {formatTimestamp(metrics.lastSettlementAt)}. Aggregates retain at most{" "}
         {metrics.retentionDays} days of pseudonymized analytics.
       </p>
 
@@ -149,7 +157,7 @@ export function LiveMetrics(): React.ReactElement {
               rel="noreferrer"
             >
               <span>
-                {receipt.transactionHash.slice(0, 10)}…
+                {receipt.transactionHash.slice(0, 10)}..
                 {receipt.transactionHash.slice(-8)}
               </span>
               <span>${formatUsdc(receipt.amountAtomic)}</span>

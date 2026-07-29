@@ -1,126 +1,109 @@
 import { LiveMetrics } from "../components/live-metrics";
+import { SiteFooter, SiteNav } from "../components/site-chrome";
 
 export const revalidate = 300;
 
 const gatewayUrl = "https://paycrawl-gateway.raghu250407.workers.dev";
 
-function Mark(): React.ReactElement {
-  return (
-    <svg aria-hidden="true" className="mark" viewBox="0 0 48 48" fill="none">
-      <path
-        d="M7 12.5h24.5L41 22l-9.5 9.5H7V12.5Z"
-        stroke="currentColor"
-        strokeWidth="2.6"
-      />
-      <path
-        d="M7 20h26M15 12.5v19M25 12.5v19"
-        stroke="currentColor"
-        strokeWidth="2.6"
-      />
-      <circle cx="37" cy="31.5" r="5" fill="currentColor" />
-    </svg>
-  );
-}
-
 export default function Home(): React.ReactElement {
   return (
-    <main>
-      <nav className="nav" aria-label="Primary navigation">
-        <a className="brand" href="#top">
-          <Mark />
-          <span>PayCrawl</span>
-        </a>
-        <div className="nav-links">
-          <a href="#how-it-works">How it works</a>
-          <a href="#start">Start</a>
-          <a href="#live">Live ledger</a>
-        </div>
-        <a className="nav-cta" href="/docs">
-          Read the docs <span>↗</span>
-        </a>
-      </nav>
+    <main id="main-content">
+      <SiteNav
+        links={[
+          { href: "#how-it-works", label: "How it works" },
+          { href: "#start", label: "Start" },
+          { href: "#live", label: "Live ledger" },
+        ]}
+        action={{ href: "/docs", label: "Read the docs" }}
+      />
 
       <section className="hero landing-hero" id="top">
         <div className="hero-copy">
           <p className="eyebrow hero-kicker">
-            <span className="signal" /> Celo USDC · x402 v2
+            <span className="signal" aria-hidden="true" /> Celo USDC / x402
           </p>
-          <h1>
-            Content that <em>pays</em> its way.
-          </h1>
+          <h1>Turn a crawl into a paid request.</h1>
           <p className="hero-lede">
-            PayCrawl lets an AI agent buy machine-readable content in one HTTP
-            flow. Publishers get paid directly; agents stay in control of their
-            own wallet and budget.
+            PayCrawl lets agents buy machine-readable content in one HTTP flow.
+            Publishers set the price. The agent validates the quote, signs from
+            its own wallet, and receives a receipt with the response.
           </p>
           <div className="hero-actions">
-            <a className="button button-primary" href="/docs#agents">
-              Install for an agent <span>↗</span>
+            <a className="button button-primary" href="/docs#agent">
+              Set up an agent <span aria-hidden="true">↗</span>
             </a>
-            <a className="button button-quiet" href="/docs#publisher">
-              Publish a route <span>↗</span>
+            <a className="button button-secondary" href="/docs#publisher">
+              Publish a route <span aria-hidden="true">↗</span>
             </a>
           </div>
           <p className="microcopy">
-            No account with PayCrawl. No shared custody. The payment itself is
-            the access credential.
+            No account. No shared custody. Payment authorizes access.
           </p>
         </div>
 
-        <div className="hero-diagram" aria-label="PayCrawl payment sequence">
-          <div className="diagram-topline">
-            <span>ONE REQUEST / ONE RECEIPT</span>
-            <span>USDC / CELO</span>
+        <div className="protocol-panel" aria-label="PayCrawl payment sequence">
+          <div className="panel-topline">
+            <span>REQUEST FLOW</span>
+            <span>CELO MAINNET</span>
           </div>
-          <div className="trace">
-            <div className="trace-node agent-node">
-              <span className="node-index">01</span>
-              <strong>Ask</strong>
-              <small>agent requests content</small>
-            </div>
-            <div className="trace-arrow">
-              <span>402</span>
-              <i />
-            </div>
-            <div className="trace-node gate-node">
-              <span className="node-index">02</span>
-              <strong>Approve</strong>
-              <small>wallet signs exact USDC</small>
-            </div>
-            <div className="trace-arrow">
-              <span>retry</span>
-              <i />
-            </div>
-            <div className="trace-node celo-node">
-              <span className="node-index">03</span>
-              <strong>Read</strong>
-              <small>content and receipt arrive</small>
-            </div>
+          <ol className="protocol-steps">
+            <li>
+              <span className="step-index">01</span>
+              <div>
+                <strong>Request</strong>
+                <p>Agent asks for a protected route.</p>
+              </div>
+              <code>GET /agent/page/*</code>
+            </li>
+            <li>
+              <span className="step-index">02</span>
+              <div>
+                <strong>Quote</strong>
+                <p>Gateway returns price and payout details.</p>
+              </div>
+              <code>402 PAYMENT REQUIRED</code>
+            </li>
+            <li>
+              <span className="step-index">03</span>
+              <div>
+                <strong>Pay and read</strong>
+                <p>Agent signs the approved quote and retries.</p>
+              </div>
+              <code>PAYMENT-RESPONSE</code>
+            </li>
+          </ol>
+          <div className="panel-rule">
+            Settlement occurs only after successful origin delivery.
           </div>
-          <div className="trace-receipt">
-            <span className="receipt-dot" /> <span>PAYMENT-RESPONSE</span>
-            <code>on-chain receipt</code>
-            <b>only on success</b>
-          </div>
-          <div className="scanline" />
         </div>
       </section>
 
       <section className="landing-flow" id="how-it-works">
-        <p className="eyebrow">No checkout page</p>
-        <h2>Just an ordinary request that knows how to pay.</h2>
-        <ol>
+        <div className="section-heading">
+          <p className="eyebrow">One protocol, two operators</p>
+          <h2>Set terms once. Pay only when content is delivered.</h2>
+        </div>
+        <ol className="flow-list">
           <li>
             <span>01</span>
-            <p>Discover a route and its price for free.</p>
+            <div>
+              <h3>Discover</h3>
+              <p>The agent reads the public manifest and route quote.</p>
+            </div>
           </li>
           <li>
             <span>02</span>
-            <p>Accept only the price and publisher your policy allows.</p>
+            <div>
+              <h3>Verify</h3>
+              <p>Its policy checks the asset, network, price, and publisher.</p>
+            </div>
           </li>
           <li>
             <span>03</span>
-            <p>Receive content only after the payment settles.</p>
+            <div>
+              <h3>Settle</h3>
+              <p>The gateway releases payment only with a successful response.</p>
+            </div>
           </li>
         </ol>
         <a
@@ -129,69 +112,47 @@ export default function Home(): React.ReactElement {
           target="_blank"
           rel="noreferrer"
         >
-          Inspect the live 402 challenge <span>↗</span>
+          Inspect the live 402 challenge <span aria-hidden="true">↗</span>
         </a>
       </section>
 
       <section className="operator-paths" id="start">
-        <header>
+        <div className="section-heading">
           <p className="eyebrow">Start with your role</p>
-          <h2>Agents pay. Publishers set the terms.</h2>
-        </header>
+          <h2>Agents keep control. Publishers receive the payment.</h2>
+        </div>
         <div className="operator-grid">
           <article className="operator-card operator-agent">
             <div className="operator-card-topline">
-              <span>01 / AGENT</span>
-              <span>LOCAL SIGNER</span>
+              <span>FOR AGENTS</span>
+              <span>LOCAL WALLET</span>
             </div>
-            <h3>Give the agent a bounded payer wallet.</h3>
-            <ol>
-              <li>
-                Fund the wallet the agent runtime already controls with Celo
-                USDC.
-              </li>
-              <li>
-                Set the publisher allowlist and spend ceiling in the agent
-                policy.
-              </li>
-              <li>
-                Install the workflow skill. The agent validates every live quote
-                before it signs.
-              </li>
-            </ol>
+            <h3>Install the workflow, then set a policy.</h3>
+            <p>
+              The skill creates or reuses a dedicated payer wallet through the
+              agent runtime. It asks for a Celo USDC top-up only when an
+              approved request needs one.
+            </p>
             <pre className="operator-code">
-              <code>
-                npx skills add Some1Uknow/paycrawl \\ --skill paycrawl --agent
-                '*' --yes --full-depth
-              </code>
+              <code>{"npx skills add Some1Uknow/paycrawl --skill paycrawl --agent '*' --yes --full-depth"}</code>
             </pre>
             <a className="text-link" href="/docs#agent">
-              Agent guide <span>↗</span>
+              Agent setup <span aria-hidden="true">↗</span>
             </a>
           </article>
           <article className="operator-card operator-publisher">
             <div className="operator-card-topline">
-              <span>02 / PUBLISHER</span>
+              <span>FOR PUBLISHERS</span>
               <span>DIRECT PAYOUT</span>
             </div>
-            <h3>Put a price in front of protected machine-readable routes.</h3>
-            <ol>
-              <li>Keep the origin private behind the PayCrawl origin token.</li>
-              <li>
-                Choose a Celo payout address and an atomic USDC price per route
-                pattern.
-              </li>
-              <li>
-                Deploy the gateway. It issues the 402 and settles only after
-                delivery.
-              </li>
-            </ol>
-            <p className="operator-note">
-              Your payout address receives settlement. PayCrawl does not custody
-              publisher revenue.
+            <h3>Protect a route and name its USDC price.</h3>
+            <p>
+              Keep the origin private, configure the payout address and route
+              price, then deploy the gateway to Cloudflare. PayCrawl never
+              holds publisher revenue.
             </p>
-            <a className="text-link" href="/docs#publisher">
-              Publisher guide <span>↗</span>
+            <a className="button button-secondary" href="/docs#publisher">
+              Publisher setup <span aria-hidden="true">↗</span>
             </a>
           </article>
         </div>
@@ -201,21 +162,7 @@ export default function Home(): React.ReactElement {
         <LiveMetrics />
       </section>
 
-      <footer>
-        <a className="brand" href="#top">
-          <Mark />
-          <span>PayCrawl</span>
-        </a>
-        <p>Turn block-or-scrape into pay-per-crawl.</p>
-        <a href="/docs">Docs</a>
-        <a
-          href="https://github.com/Some1Uknow/paycrawl"
-          target="_blank"
-          rel="noreferrer"
-        >
-          GitHub ↗
-        </a>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }
