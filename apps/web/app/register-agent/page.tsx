@@ -1,7 +1,7 @@
 "use client";
 
 import { toDataSuffix } from "@celo/attribution-tags";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const chainId = "0xa4ec";
 const expectedOwner = "0x5287c8e5017edeec5f733fa926676c21ffcb8b65";
@@ -25,6 +25,9 @@ function provider(): Provider {
 }
 
 async function switchToCelo(wallet: Provider): Promise<void> {
+  const activeChain = await wallet.request({ method: "eth_chainId" });
+  if (activeChain === chainId) return;
+
   try {
     await wallet.request({
       method: "wallet_switchEthereumChain",
@@ -53,13 +56,19 @@ export default function RegisterAgentPage(): React.ReactElement {
   );
   const [busy, setBusy] = useState(false);
   const [transaction, setTransaction] = useState<string>();
+  const [walletAvailable, setWalletAvailable] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    setWalletAvailable(
+      Boolean((window as Window & { ethereum?: Provider }).ethereum),
+    );
+  }, []);
 
   async function register(): Promise<void> {
     setBusy(true);
     setTransaction(undefined);
     try {
       const wallet = provider();
-      await switchToCelo(wallet);
       const accounts = await wallet.request({ method: "eth_requestAccounts" });
       const account = Array.isArray(accounts) ? accounts[0] : undefined;
       if (
@@ -70,6 +79,7 @@ export default function RegisterAgentPage(): React.ReactElement {
           "Connect the wallet recorded in PayCrawl’s registration metadata.",
         );
       }
+      await switchToCelo(wallet);
       setStatus("Confirm the ERC-8004 identity registration in your wallet…");
       const hash = await wallet.request({
         method: "eth_sendTransaction",
@@ -110,6 +120,10 @@ export default function RegisterAgentPage(): React.ReactElement {
           in PayCrawl&apos;s metadata. The wallet signs directly; PayCrawl never
           sees a key.
         </p>
+        <p className="registration-warning">
+          One-time builder action only. Agents, publishers, and end users do not
+          use this page.
+        </p>
         <dl>
           <div>
             <dt>Owner</dt>
@@ -132,10 +146,21 @@ export default function RegisterAgentPage(): React.ReactElement {
           className="button button-primary"
           type="button"
           onClick={() => void register()}
-          disabled={busy}
+          disabled={busy || walletAvailable === false}
         >
-          {busy ? "Awaiting wallet…" : "Connect & register"}
+          {busy
+            ? "Awaiting wallet…"
+            : walletAvailable === false
+              ? "Open in browser wallet"
+              : "Connect & register"}
         </button>
+        {walletAvailable === false ? (
+          <p className="registration-help">
+            No browser wallet was detected. Open this URL in the wallet&apos;s
+            built-in browser, or in a desktop browser with the wallet extension
+            enabled.
+          </p>
+        ) : null}
         <p className="registration-status" role="status">
           {status}
         </p>
