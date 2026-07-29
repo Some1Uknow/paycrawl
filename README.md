@@ -119,8 +119,10 @@ reuses it on later crawls, and requests a bounded USDC top-up only when its
 approved policy cannot cover the next quote. The operator should not need to
 clone this repository, handle a key, or configure an environment file.
 
-The CLI below is the reference integration for agent-runtime developers.
-Create an uncommitted local environment file from [apps/agent/.env.example](./apps/agent/.env.example). It must contain the payer key and a comma-separated allowlist of publisher payout addresses. The key is never accepted as a command-line option.
+The CLI below is a reference integration for agent-runtime developers, not an
+end-user setup path. Its local environment file is only a development harness;
+production agents must inject a runtime-managed signer and policy without
+exposing a key to an operator.
 
 ```bash
 pnpm crawl \

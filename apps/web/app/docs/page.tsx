@@ -111,7 +111,7 @@ export default function DocsPage(): React.ReactElement {
                 </span>
               </li>
               <li>
-                <span>Sign the payment with the local wallet.</span>
+                <span>Sign the payment with the persistent agent wallet.</span>
               </li>
               <li>
                 <span>
@@ -144,18 +144,21 @@ export default function DocsPage(): React.ReactElement {
             </CodeBlock>
             <p>
               The skill owns discovery, quote validation, payment, and receipt
-              handling. It uses the agent runtime&apos;s approved signer.
+              handling. It creates or reuses a dedicated payer wallet through
+              the agent runtime&apos;s approved wallet provider.
             </p>
-            <h3>Give the agent authority once</h3>
+            <h3>Fund the agent when it asks</h3>
             <p>
-              Connect a funded Celo mainnet USDC wallet through the agent
-              runtime&apos;s own wallet or secret manager. Do not send USDC
-              directly to a publisher and never paste a key into chat.
+              On its first paid crawl, the agent creates a dedicated Celo wallet
+              and keeps its secure wallet handle for later crawls. If its
+              balance cannot cover an approved quote, it asks for one bounded
+              Celo USDC top-up to that wallet.
             </p>
             <p>
-              Approve publisher addresses, a per-request ceiling, a total
-              budget, and a request limit. The skill refuses any quote outside
-              that policy.
+              Set approved publisher addresses, a per-request ceiling, a total
+              budget, and a request limit once. The skill refuses any quote
+              outside that policy. Never paste a key, edit an environment file,
+              or send USDC directly to a publisher.
             </p>
             <h3>Ask the agent</h3>
             <p>

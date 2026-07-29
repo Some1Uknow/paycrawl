@@ -92,9 +92,9 @@ Set Cloudflare WAF rate limits for `/health` and `/api/stats`, then monitor the 
 
 ## 2. Make one real x402 payment
 
-1. Fund a **separate payer wallet** with a small amount of Celo mainnet USDC. Do not use the private key of the registered `payTo` wallet as the payer.
-2. Create a local, uncommitted `apps/agent/.env` using `apps/agent/.env.example`. Put the payer key only in that local file and allowlist `0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7`.
-3. Run one real crawl against the deployed paid URL:
+1. Let the agent runtime create or reuse its dedicated persistent Celo payer wallet. Do not use the registered `payTo` wallet as the payer.
+2. Fund that agent wallet with a small amount of Celo mainnet USDC when the runtime requests a bounded top-up. Give it a policy that allowlists `0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7` and caps this demo at one `$0.001` request.
+3. The runtime performs one real crawl against the deployed paid URL:
 
 ```bash
 pnpm crawl \
