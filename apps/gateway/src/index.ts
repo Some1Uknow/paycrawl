@@ -15,7 +15,7 @@ function appForEnvironment(
 ): ReturnType<typeof createGateway> {
   // The closure contains the origin token, so rotation naturally creates a new
   // app instance. The key is module-private and never returned or logged.
-  const key = `${env.GATEWAY_CONFIG}\u0000${env.ORIGIN_TOKEN}\u0000${env.ANALYTICS_HMAC_KEY}`;
+  const key = `${env.GATEWAY_CONFIG}\u0000${env.ORIGIN_TOKEN}\u0000${env.ANALYTICS_HMAC_KEY}\u0000${env.FACILITATOR_API_KEY}`;
   if (!cachedGateway || cachedKey !== key) {
     cachedKey = key;
     cachedGateway = createGateway(env);

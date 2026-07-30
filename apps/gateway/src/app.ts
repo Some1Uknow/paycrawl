@@ -135,6 +135,14 @@ function defaultCache(): Cache | undefined {
   return typeof caches === "undefined" ? undefined : caches.default;
 }
 
+function facilitatorAuthHeaders(apiKey: string) {
+  return {
+    supported: { "X-API-Key": apiKey },
+    verify: { "X-API-Key": apiKey },
+    settle: { "X-API-Key": apiKey },
+  };
+}
+
 function cacheKey(name: string, config: GatewayConfig): Request {
   const scope = encodeURIComponent(
     `${config.payTo.toLowerCase()}|${config.originBaseUrl}|${config.originHealthPath}`,
@@ -183,10 +191,15 @@ export function createGateway(
 ): GatewayApp {
   assertStrongSecret(env.ORIGIN_TOKEN, "ORIGIN_TOKEN");
   assertStrongSecret(env.ANALYTICS_HMAC_KEY, "ANALYTICS_HMAC_KEY");
+  assertStrongSecret(env.FACILITATOR_API_KEY, "FACILITATOR_API_KEY");
   const config = parseGatewayConfig(env.GATEWAY_CONFIG);
   const facilitator =
     dependencies.facilitator ??
-    new HTTPFacilitatorClient({ url: FACILITATOR_URL });
+    new HTTPFacilitatorClient({
+      url: FACILITATOR_URL,
+      createAuthHeaders: async () =>
+        facilitatorAuthHeaders(env.FACILITATOR_API_KEY),
+    });
   const cache = dependencies.cache ?? defaultCache();
   const resourceServer = new x402ResourceServer(facilitator).register(
     CELO_NETWORK,

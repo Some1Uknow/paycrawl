@@ -4,5 +4,7 @@
 # gateway rejects them, so this example can never be deployed accidentally.
 ORIGIN_TOKEN=
 ANALYTICS_HMAC_KEY=
+# Get this key from the Celo x402 facilitator. Store it as a Worker secret in production.
+FACILITATOR_API_KEY=
 # JSON matching GatewayConfig. Replace both the origin and the non-zero payout address.
 GATEWAY_CONFIG={"originBaseUrl":"https://publisher.example","originHealthPath":"/healthz","payTo":"0x1111111111111111111111111111111111111111","protectedRoutes":[{"pattern":"/agent/page/*","amountAtomic":"1000"},{"pattern":"/agent/feed/*","amountAtomic":"10000"},{"pattern":"/agent/export/*","amountAtomic":"100000"}],"facilitatorUrl":"https://api.x402.celo.org","network":"eip155:42220"}

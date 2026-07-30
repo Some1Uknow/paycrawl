@@ -29,6 +29,14 @@ const analyticsFixtureValue = [
   "quartz",
   "river",
 ].join("-");
+const facilitatorFixtureValue = [
+  "willow",
+  "xenon",
+  "yarrow",
+  "zephyr",
+  "atlas",
+  "birch",
+].join("-");
 
 type Harness = {
   app: ReturnType<typeof createGateway>;
@@ -57,6 +65,7 @@ function makeBindings(): GatewayBindings {
     } as unknown as Queue<never>,
     ORIGIN_TOKEN: originFixtureValue,
     ANALYTICS_HMAC_KEY: analyticsFixtureValue,
+    FACILITATOR_API_KEY: facilitatorFixtureValue,
     GATEWAY_CONFIG: JSON.stringify({
       originBaseUrl: "https://publisher.example",
       originHealthPath: "/healthz",
@@ -154,6 +163,72 @@ function signedHeaders(accepted: PaymentRequirements): Headers {
 }
 
 describe("x402 gateway protocol", () => {
+  it("authenticates default facilitator settlement requests", async () => {
+    const originalFetch = globalThis.fetch;
+    const facilitatorHeaders: string[] = [];
+    globalThis.fetch = async (input, init) => {
+      const url = new URL(
+        typeof input === "string" || input instanceof URL ? input : input.url,
+      );
+      const apiKey = new Headers(init?.headers).get("X-API-Key") ?? "";
+      facilitatorHeaders.push(apiKey);
+      if (url.pathname === "/supported") {
+        if (apiKey !== facilitatorFixtureValue) {
+          return Response.json(
+            { error: "unauthorized", message: "Missing X-API-Key" },
+            { status: 401 },
+          );
+        }
+        return Response.json({
+          kinds: [
+            { x402Version: 2, scheme: "exact", network: "eip155:42220" },
+          ],
+          extensions: [],
+          signers: {},
+        });
+      }
+      if (apiKey !== facilitatorFixtureValue) {
+        return Response.json(
+          { error: "unauthorized", message: "Missing X-API-Key" },
+          { status: 401 },
+        );
+      }
+      if (url.pathname === "/verify") {
+        return Response.json({ isValid: true, payer });
+      }
+      if (url.pathname === "/settle") {
+        return Response.json({
+          success: true,
+          transaction,
+          network: "eip155:42220",
+          payer,
+          amount: "1000",
+        });
+      }
+      return new Response("not found", { status: 404 });
+    };
+
+    try {
+      const app = createGateway(makeBindings(), {
+        fetchImpl: async () => new Response("publisher content"),
+      });
+      const accepted = await getChallenge(app);
+      const response = await app.request(
+        "https://gateway.example/agent/page/article-1",
+        { headers: signedHeaders(accepted) },
+      );
+
+      expect(response.status).toBe(200);
+      expect(facilitatorHeaders).toEqual([
+        facilitatorFixtureValue,
+        facilitatorFixtureValue,
+        facilitatorFixtureValue,
+      ]);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
   it("permits content-free HEAD and rejects other protected-route methods", async () => {
     const harness = makeHarness();
     const head = await harness.app.request(

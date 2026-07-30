@@ -54,11 +54,12 @@ pnpm --filter @paycrawl/gateway exec wrangler queues create paycrawl-settlements
 
 3. Configure the publisher origin to reject any request without the exact `X-PayCrawl-Origin-Token` secret header. It must serve `HEAD {originBaseUrl}{originHealthPath}` as an authenticated, redirect-free `204 No Content`. The default health path is `/healthz`; for `originBaseUrl: "https://publisher.example/content"`, the Worker checks `https://publisher.example/content/healthz`.
 
-4. Store all three runtime values as Worker secrets, apply the migration, and deploy:
+4. Get a Celo x402 facilitator API key. Store all four runtime values as Worker secrets, apply the migration, and deploy:
 
 ```bash
 pnpm --filter @paycrawl/gateway exec wrangler secret put ORIGIN_TOKEN
 pnpm --filter @paycrawl/gateway exec wrangler secret put ANALYTICS_HMAC_KEY
+pnpm --filter @paycrawl/gateway exec wrangler secret put FACILITATOR_API_KEY
 pnpm --filter @paycrawl/gateway exec wrangler secret put GATEWAY_CONFIG
 pnpm --filter @paycrawl/gateway exec wrangler d1 migrations apply paycrawl-analytics --remote
 pnpm --filter @paycrawl/gateway deploy

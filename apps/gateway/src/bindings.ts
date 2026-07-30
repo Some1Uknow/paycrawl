@@ -6,6 +6,7 @@ export type GatewayBindings = {
   GATEWAY_CONFIG: string;
   ORIGIN_TOKEN: string;
   ANALYTICS_HMAC_KEY: string;
+  FACILITATOR_API_KEY: string;
 };
 
 export type GatewayVariables = {
