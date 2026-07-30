@@ -1,4 +1,11 @@
-import { chmod, mkdtemp, readFile, rm, stat } from "node:fs/promises";
+import {
+  chmod,
+  mkdtemp,
+  readFile,
+  rm,
+  stat,
+  writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -71,5 +78,96 @@ describe("publisher approval policy", () => {
     );
 
     expect((await stat(directory)).mode & 0o777).toBe(0o755);
+  });
+
+  describe("rejects an untrustworthy policy file", () => {
+    it("rejects a policy file readable by group or other", async () => {
+      const directory = await mkdtemp(join(tmpdir(), "paycrawl-policy-"));
+      directories.push(directory);
+      const filePath = join(directory, "publishers.json");
+      await writeFile(filePath, JSON.stringify({ version: 1, approvals: [] }), {
+        mode: 0o644,
+      });
+
+      await expect(loadPublisherPolicy({ filePath })).rejects.toThrow(
+        /readable only by its owner/,
+      );
+    });
+
+    it("rejects a policy file that is not valid JSON", async () => {
+      const directory = await mkdtemp(join(tmpdir(), "paycrawl-policy-"));
+      directories.push(directory);
+      const filePath = join(directory, "publishers.json");
+      await writeFile(filePath, "{not json", { mode: 0o600 });
+
+      await expect(loadPublisherPolicy({ filePath })).rejects.toThrow(
+        /not valid JSON/,
+      );
+    });
+
+    it("rejects an unsupported policy file version", async () => {
+      const directory = await mkdtemp(join(tmpdir(), "paycrawl-policy-"));
+      directories.push(directory);
+      const filePath = join(directory, "publishers.json");
+      await writeFile(filePath, JSON.stringify({ version: 2, approvals: [] }), {
+        mode: 0o600,
+      });
+
+      await expect(loadPublisherPolicy({ filePath })).rejects.toThrow(
+        /Unsupported PayCrawl publisher policy file/,
+      );
+    });
+
+    it("rejects a tampered approval with a non-HTTPS origin", async () => {
+      const directory = await mkdtemp(join(tmpdir(), "paycrawl-policy-"));
+      directories.push(directory);
+      const filePath = join(directory, "publishers.json");
+      await writeFile(
+        filePath,
+        JSON.stringify({
+          version: 1,
+          approvals: [
+            {
+              origin: "http://publisher.example",
+              payTo,
+              network: "eip155:42220",
+              asset: "0xcebA9300f2b948710d2653dD7B07f33A8B32118C",
+              approvedAt: new Date().toISOString(),
+            },
+          ],
+        }),
+        { mode: 0o600 },
+      );
+
+      await expect(loadPublisherPolicy({ filePath })).rejects.toThrow(
+        /invalid origin/,
+      );
+    });
+
+    it("rejects a tampered approval with a malformed payout address", async () => {
+      const directory = await mkdtemp(join(tmpdir(), "paycrawl-policy-"));
+      directories.push(directory);
+      const filePath = join(directory, "publishers.json");
+      await writeFile(
+        filePath,
+        JSON.stringify({
+          version: 1,
+          approvals: [
+            {
+              origin: "https://publisher.example",
+              payTo: "not-an-address",
+              network: "eip155:42220",
+              asset: "0xcebA9300f2b948710d2653dD7B07f33A8B32118C",
+              approvedAt: new Date().toISOString(),
+            },
+          ],
+        }),
+        { mode: 0o600 },
+      );
+
+      await expect(loadPublisherPolicy({ filePath })).rejects.toThrow(
+        /invalid payout address/,
+      );
+    });
   });
 });
