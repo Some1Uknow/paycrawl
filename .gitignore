@@ -23,3 +23,4 @@ service-account*.json
 .superstack/
 *.log
 *.tsbuildinfo
+.submission-checklist.private.md

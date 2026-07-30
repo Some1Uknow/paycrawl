@@ -1,76 +1,118 @@
 # PayCrawl
 
-> Turn block-or-scrape into pay-per-crawl.
+> Paid content for AI agents.
 
-PayCrawl is a Cloudflare edge gateway that lets a publisher offer paid, machine-readable content to AI agents over x402. An agent receives a 402 quote, signs a bounded Celo USDC authorization, and gets the origin response plus an on-chain receipt only after the origin succeeds.
+PayCrawl lets a publisher put a price on machine-readable content. An AI agent
+checks the price, pays in Celo USDC from its own wallet, and receives the
+content with a payment receipt.
+
+There is no reader checkout, shared wallet, or PayCrawl custody layer.
+
+## Live project
+
+- Gateway: <https://paycrawl-gateway.raghu250407.workers.dev>
+- Payment manifest: <https://paycrawl-gateway.raghu250407.workers.dev/.well-known/paycrawl.json>
+- Protected demo route: <https://paycrawl-gateway.raghu250407.workers.dev/agent/page/article-1>
+- Live settlement telemetry: <https://paycrawl.vercel.app/api/stats>
+- ERC-8004 agent identity: <https://8004scan.io/agents/celo/9746>
+- Celo Builders attribution: `celo_468e1efe7287`
+
+The live route charges `0.001 USDC` on Celo mainnet. An unsigned request gets
+a standard x402 `402 Payment Required` challenge. A successful signed request
+returns the protected response and a `PAYMENT-RESPONSE` receipt. The receipt
+contains the Celo settlement transaction; the public telemetry lists completed
+settlements without exposing payer addresses.
+
+## What problem it solves
+
+Publishers can block crawlers, but they cannot easily charge AI agents for
+useful content. Agents can access APIs, but they need a safe way to make small,
+bounded payments without a human checkout flow.
+
+PayCrawl makes the HTTP request itself the purchase flow:
 
 ```text
-Agent GET /agent/page/*
-  → x402 v2 402 challenge
-  → signed Celo USDC authorization
-  → gateway verifies authorization
-  → locked publisher origin returns 2xx content
-  → facilitator settles on Celo mainnet
-  → content + PAYMENT-RESPONSE receipt
+agent requests protected content
+  -> gateway returns a Celo USDC price
+  -> agent checks its local policy and wallet balance
+  -> agent signs one x402 payment authorization
+  -> gateway delivers the content
+  -> Celo facilitator settles the payment
+  -> agent receives content and an on-chain receipt
 ```
 
-The product and hackathon requirements are preserved in [SPEC.md](./SPEC.md). Registration information is intentionally kept in [REGISTRATION.md](./REGISTRATION.md), with no private keys or origin secrets.
+The gateway settles only after the publisher origin returns a successful
+response. A failed origin request does not unlock content or settle payment.
 
-## Workspace
+## Try it as an agent
 
-```text
-apps/gateway  Hono Cloudflare Worker, queued D1 receipt analytics, secure paid proxy
-apps/web      Next.js product site, validated public metrics console
-apps/agent    Node CLI with pre-sign Celo USDC budget enforcement
-packages/shared  Config schemas, protocol constants, receipt and metrics types
-```
-
-## Local development
-
-Requires Node 22+ and pnpm 10.
+Install the portable PayCrawl skill in a skill-aware agent project:
 
 ```bash
+npx skills add Some1Uknow/paycrawl --skill paycrawl --agent '*' --yes --full-depth
+```
+
+Then give the agent a plain-language instruction:
+
+```text
+Use PayCrawl to crawl https://paycrawl-gateway.raghu250407.workers.dev/agent/page/article-1.
+Use only Celo USDC. Ask me before approving a new publisher. Do not spend more
+than 0.001 USDC on this request or 0.01 USDC in total. Return the content and
+PAYMENT-RESPONSE receipt.
+```
+
+The agent discovers the manifest and quote, checks the network, USDC asset,
+payout address, price, request limit, and total budget before it signs. It
+stores an approved publisher origin and payout-address pair locally, so a
+changed payout address always requires new approval.
+
+### Agent wallet model
+
+The agent owns the payer wallet. PayCrawl never receives a private key or
+custodies funds.
+
+The reference CLI creates a dedicated encrypted Celo wallet on first use and
+reuses it later. On macOS, its passphrase is created or reused in Keychain. The
+wallet file contains encrypted material only; the raw private key is never
+printed or written to the repository. If the wallet needs funds, the agent asks
+for one bounded Celo USDC top-up to its own address.
+
+For agent-runtime developers, the reference client is available here:
+
+```bash
+git clone https://github.com/Some1Uknow/paycrawl.git
+cd paycrawl
 pnpm install
-pnpm check
-pnpm build
+pnpm crawl \
+  --url https://paycrawl-gateway.raghu250407.workers.dev/agent/page/article-1 \
+  --max-requests 1 \
+  --max-per-request-usdc 0.001 \
+  --max-total-usdc 0.001 \
+  --approve-publisher
 ```
 
-`pnpm check` type-checks, lints, and runs the focused security, configuration, redirect, challenge-policy, and budget tests.
+Do not paste a private key, seed phrase, origin token, or facilitator key into
+chat or source control.
 
-## Deploy a publisher gateway
+## Publish a paid route
 
-Each publisher deploys their own Worker, D1 database, Cloudflare Queue, origin token, analytics HMAC key, and Celo payout address. There is no shared proxy and no PayCrawl custody. The Worker deliberately has no deployable default configuration.
+Publishers keep control of their content origin, Cloudflare account, route
+prices, payout address, and revenue. PayCrawl is not a central proxy or
+publisher account.
 
-1. Authenticate with Cloudflare, then create the data resources. Copy the reported D1 ID into `database_id` in [apps/gateway/wrangler.jsonc](./apps/gateway/wrangler.jsonc).
+Each publisher deploys a Cloudflare Worker with:
 
-```bash
-pnpm --filter @paycrawl/gateway exec wrangler login
-pnpm --filter @paycrawl/gateway exec wrangler d1 create paycrawl-analytics
-pnpm --filter @paycrawl/gateway exec wrangler queues create paycrawl-settlements
-pnpm --filter @paycrawl/gateway exec wrangler queues create paycrawl-settlements-dlq
-```
+- an HTTPS origin that rejects requests without `X-PayCrawl-Origin-Token`;
+- a Celo wallet address that receives USDC;
+- a route-to-price policy; and
+- a Celo x402 facilitator API key.
 
-2. Copy [apps/gateway/.dev.vars.example](./apps/gateway/.dev.vars.example) to an uncommitted `.dev.vars`. Generate two independent secrets with `openssl rand -hex 32`; replace the sample origin, non-zero payout address, and JSON route policy. Keep both values out of the origin's logs and source control.
-
-3. Configure the publisher origin to reject any request without the exact `X-PayCrawl-Origin-Token` secret header. It must serve `HEAD {originBaseUrl}{originHealthPath}` as an authenticated, redirect-free `204 No Content`. The default health path is `/healthz`; for `originBaseUrl: "https://publisher.example/content"`, the Worker checks `https://publisher.example/content/healthz`.
-
-4. Get a Celo x402 facilitator API key. Store all four runtime values as Worker secrets, apply the migration, and deploy:
-
-```bash
-pnpm --filter @paycrawl/gateway exec wrangler secret put ORIGIN_TOKEN
-pnpm --filter @paycrawl/gateway exec wrangler secret put ANALYTICS_HMAC_KEY
-pnpm --filter @paycrawl/gateway exec wrangler secret put FACILITATOR_API_KEY
-pnpm --filter @paycrawl/gateway exec wrangler secret put GATEWAY_CONFIG
-pnpm --filter @paycrawl/gateway exec wrangler d1 migrations apply paycrawl-analytics --remote
-pnpm --filter @paycrawl/gateway deploy
-```
-
-The Worker configuration must have this shape:
+The gateway configuration uses Celo mainnet and native USDC explicitly:
 
 ```ts
 type GatewayConfig = {
   originBaseUrl: string;
-  originHealthPath: string; // default: "/healthz"; must return authenticated 204
+  originHealthPath: string; // authenticated, redirect-free 204 endpoint
   payTo: `0x${string}`;
   protectedRoutes: Array<{
     pattern: string;
@@ -81,30 +123,76 @@ type GatewayConfig = {
 };
 ```
 
-Default route prices are atomic USDC (six decimals):
+Default prices use six-decimal USDC atomic units:
 
-| Route             | Atomic USDC |    USDC |
-| ----------------- | ----------: | ------: |
-| `/agent/page/*`   |      `1000` | `0.001` |
-| `/agent/feed/*`   |     `10000` |  `0.01` |
-| `/agent/export/*` |    `100000` |  `0.10` |
+| Route             |        Price |
+| ----------------- | -----------: |
+| `/agent/page/*`   | `0.001 USDC` |
+| `/agent/feed/*`   |  `0.01 USDC` |
+| `/agent/export/*` |  `0.10 USDC` |
 
-The configuration schema rejects a route above `1000000000` atomic units (1,000 USDC). Agents should still set a lower local per-request budget.
+### Deploy a publisher gateway
 
-## Gateway behavior and security
+Authenticate with Cloudflare and create the analytics resources:
 
-- Accepts only `GET` and content-free `HEAD` requests on `/agent/*`.
-- Uses x402 v2 `exact` payments on Celo (`eip155:42220`) with explicit native Celo USDC `0xcebA9300f2b948710d2653dD7B07f33A8B32118C` amounts and `{ name: "USDC", version: "2" }` metadata.
-- Verifies before origin access; settles only a successful `GET` origin response. Origin errors, unsafe redirects, and handler failures cancel the verified authorization rather than settling it.
-- Locks the proxy to one HTTPS DNS origin and rejects localhost, literal IPs, cross-host redirects, traversal, credentials, unsafe health paths, and redirects that escape the configured origin base path.
-- Forwards no cookies, authorization, payment, forwarding, or hop-by-hop headers to the origin. Paid responses are always `Cache-Control: private, no-store`.
-- Applies a 12-second origin timeout and a 4 MiB origin-response ceiling; the CLI separately waits up to 75 seconds for an x402 settlement response and caps fetched responses at 2 MiB by default.
-- Queues settlement analytics outside the payment path, retries D1 writes, retains data for 90 days, and places exhausted queue messages in `paycrawl-settlements-dlq` for operator review.
-- Stores only successful transaction hash, keyed payer HMAC, amount, route category, latency, and timestamp in D1. Public stats omit raw payer addresses, private paths, signatures, private URLs, and content.
-- Caches `/health` and `/api/stats` for 15 seconds to limit public-endpoint amplification. Add Cloudflare WAF rate-limit rules for these paths and alert on the dead-letter queue before enabling a public custom domain.
-- Emits redacted JSON Worker-log events for cache failures, canceled-payment telemetry failures, queue retries, invalid queue messages, and retention-prune failures. Alert on `settlement_analytics_delivery_failed`, repeated `settlement_analytics_retry_scheduled`, and the dead-letter queue; events intentionally exclude secrets, signatures, payer addresses, full paths, and origin URLs.
+```bash
+pnpm --filter @paycrawl/gateway exec wrangler login
+pnpm --filter @paycrawl/gateway exec wrangler d1 create paycrawl-analytics
+pnpm --filter @paycrawl/gateway exec wrangler queues create paycrawl-settlements
+pnpm --filter @paycrawl/gateway exec wrangler queues create paycrawl-settlements-dlq
+```
 
-Free endpoints:
+Add the reported D1 ID to [apps/gateway/wrangler.jsonc](./apps/gateway/wrangler.jsonc).
+Copy [apps/gateway/.dev.vars.example](./apps/gateway/.dev.vars.example) to an
+uncommitted `.dev.vars` for local development. Generate independent origin and
+analytics secrets.
+
+Store the production values as Worker secrets, apply the migration, then
+deploy:
+
+```bash
+pnpm --filter @paycrawl/gateway exec wrangler secret put ORIGIN_TOKEN
+pnpm --filter @paycrawl/gateway exec wrangler secret put ANALYTICS_HMAC_KEY
+pnpm --filter @paycrawl/gateway exec wrangler secret put FACILITATOR_API_KEY
+pnpm --filter @paycrawl/gateway exec wrangler secret put GATEWAY_CONFIG
+pnpm --filter @paycrawl/gateway exec wrangler d1 migrations apply paycrawl-analytics --remote
+pnpm --filter @paycrawl/gateway deploy
+```
+
+`FACILITATOR_API_KEY` is required for the production settlement call. Keep all
+four values out of git, logs, and client-side code.
+
+## Why this is safe enough to automate
+
+PayCrawl is designed to make the payment decision local to the agent:
+
+- It accepts one unambiguous x402 v2 `exact` quote on `eip155:42220` only.
+- It accepts only the official native Celo USDC token at `0xcebA9300f2b948710d2653dD7B07f33A8B32118C`.
+- It compares the exact requested URL, publisher payout address, price, asset,
+  network, request count, and total spend against local policy before signing.
+- It retries network errors only before signing. A signed request is never
+  blindly retried because settlement could be ambiguous.
+- It reads a settlement as confirmed only from a successful response with a
+  `PAYMENT-RESPONSE` header.
+- It keeps the publisher origin private behind an origin token, strips payment
+  and identity headers before forwarding, rejects redirects that leave the
+  configured origin, and serves paid responses with `Cache-Control: private, no-store`.
+
+## Architecture
+
+```text
+apps/gateway   Hono Cloudflare Worker, x402 verification, protected proxy,
+               D1 receipt analytics, and Cloudflare Queue delivery
+apps/agent     Reference CLI with wallet provisioning, publisher approval,
+               Celo USDC budget enforcement, and receipt handling
+apps/web       Product site, documentation, agent identity metadata, and
+               public settlement telemetry
+packages/shared  Protocol constants, configuration schemas, receipt types,
+                 and shared validation
+skills/paycrawl  Portable workflow for compatible agents
+```
+
+The gateway exposes free discovery and health endpoints:
 
 ```text
 GET /.well-known/paycrawl.json
@@ -112,112 +200,43 @@ GET /health
 GET /api/stats
 ```
 
-## Crawl as an agent
+It stores only successful transaction data needed for aggregates: transaction
+hash, keyed payer pseudonym, amount, route category, latency, and timestamp.
+Public metrics do not expose payer addresses, payment signatures, private
+paths, origin URLs, or paid content.
 
-For a skill-aware agent, install the [PayCrawl skill](#agent-skill). It keeps a
-dedicated runtime-managed Celo payer wallet at a stable logical reference,
-reuses it on later crawls, and requests a bounded USDC top-up only when its
-approved policy cannot cover the next quote. The operator should not need to
-clone this repository, handle a key, or configure an environment file.
+## Run locally
 
-The CLI below is a reference integration for agent-runtime developers. On its
-first paid crawl, it creates an encrypted Celo wallet file at
-`~/.paycrawl/wallets/payer-eip155-42220.json` and reuses it on later crawls.
-On macOS, it creates or reuses a dedicated `paycrawl-wallet-passphrase` in
-Keychain automatically. Other runtimes provide the passphrase through their
-secret store. The raw private key is never written to the file or printed. It also keeps explicit
-publisher approvals in `~/.paycrawl/policies/publishers-eip155-42220.json`.
-That local policy binds an HTTPS publisher origin to its Celo-USDC payout
-address; it stores no key material.
+Requires Node 22+ and pnpm 10.
 
 ```bash
-pnpm crawl \
-  --url https://gateway.example/agent/page/article-1 \
-  --max-requests 100 \
-  --max-total-usdc 0.10 \
-  --concurrency 1
+pnpm install
+pnpm check
+pnpm build
 ```
 
-For a new publisher, the CLI stops after the unsigned quote and shows the
-origin, payout address, and price. After the operator or agent runtime has
-reviewed those terms, approve that single target once:
+`pnpm check` runs formatting, linting, type checks, and focused configuration,
+security, redirect, quote-policy, and budget tests.
 
-```bash
-pnpm crawl \
-  --url https://gateway.example/agent/page/article-1 \
-  --max-requests 1 \
-  --max-total-usdc 0.001 \
-  --approve-publisher
-```
-
-Later crawls from that origin to that payout wallet run automatically within
-their request and spend limits. A publisher that changes its payout wallet
-requires a new approval. For a stricter managed deployment, set the optional
-`PAYCRAWL_ALLOWED_PAY_TO` environment variable as an additional hard
-restriction. For a stricter per-request policy, add
-`--max-per-request-usdc 0.001`.
-
-Before signing, the CLI decodes the actual 402 and requires exactly one
-approved payment option: x402 v2, Celo mainnet, the expected native USDC
-contract, USDC v2 metadata, and a locally approved origin/payout pair. It
-reserves the quote against the total budget before signing. It retries only
-unsigned challenge network requests; a signed request with an ambiguous network
-result is deliberately not retried.
-
-## Agent skill
-
-The portable [PayCrawl skill](./skills/paycrawl/SKILL.md) gives compatible
-agents a safe x402 workflow: discover a manifest, validate a quote against a
-local Celo-USDC budget, use a local signer, and return a receipt. Copy the
-skills/paycrawl folder into the target agent's skills directory.
-
-Install it in a skill-aware agent project:
-
-    npx skills add Some1Uknow/paycrawl --skill paycrawl --agent '*' --yes --full-depth
-
-The runtime must provide secure wallet custody, durable wallet-handle storage,
-balance lookup, and signing. The skill defines the wallet lifecycle and funding
-prompt. A self-hosted CLI may use the encrypted wallet file described above;
-on macOS it provisions the Keychain passphrase automatically. The passphrase
-is never sent to PayCrawl. The skill asks for explicit approval only for an
-unknown publisher origin or a new payout address, then persists that local
-policy for later requests.
-
-## Web console
-
-Set `PAYCRAWL_GATEWAY_URL` in [apps/web/.env.example](./apps/web/.env.example), then run:
-
-```bash
-pnpm --filter @paycrawl/web dev
-```
-
-The site proxies `GET /api/stats` server-side, accepts only a validated HTTPS public-host target, imposes an 8-second / 64 KiB upstream cap, validates the versioned response schema, and refreshes public telemetry every 30 seconds. Until a real gateway URL is configured, it explicitly shows telemetry as unavailable rather than presenting invented metrics.
-
-### Optional hosted demo origin
-
-The Next.js app includes a token-enforcing, publisher-controlled demo origin for the end-to-end launch demo. Deploy the web app, set the server-only `PAYCRAWL_DEMO_ORIGIN_TOKEN` to the same high-entropy value as the gateway's `ORIGIN_TOKEN`, then configure the gateway with:
+The optional hosted demo origin lives in the Next.js app. Deploy the web app,
+set server-only `PAYCRAWL_DEMO_ORIGIN_TOKEN`, and configure the Worker with:
 
 ```ts
 {
   originBaseUrl: "https://YOUR_WEB_APP_HOST/api/demo-origin",
-  originHealthPath: "/healthz",
-  // remaining production policy fields
+  originHealthPath: "/healthz"
 }
 ```
 
-The origin returns `401` without the token, authenticated `HEAD /healthz` returns `204`, and paid article routes are available under `/agent/page/*`. This is suitable for an honest product demonstration; real publishers should use their own protected content origin.
+The origin returns `401` without the token, authenticated `HEAD /healthz`
+returns `204`, and paid article routes are served under `/agent/page/*`.
 
-The web app also serves PayCrawl's public ERC-8004 registration metadata at `/.well-known/paycrawl-agent.json`. Use its deployed HTTPS URL as the `agentURI` when registering the PayCrawl identity on Celo mainnet.
+## Security
 
-## Production acceptance checklist
+Please read [SECURITY.md](./SECURITY.md) before reporting a vulnerability.
+Never include private keys, seed phrases, origin tokens, facilitator keys, or
+other secrets in issues, pull requests, logs, or demonstrations.
 
-Run these checks against the actual custom domain before announcing a public launch:
+## License
 
-1. `GET /.well-known/paycrawl.json` returns the intended non-zero `payTo`, route prices, Celo network, and USDC address.
-2. `GET /health` returns `200` only while the facilitator is available and the authenticated origin health endpoint returns exactly `204`; induce an origin `401` or `404` and confirm `/health` becomes `503` after its 15-second cache window.
-3. An unsigned protected request returns one strict x402 v2 Celo-USDC challenge. An invalid or replayed signed request returns no origin content and creates no settlement.
-4. A funded, separately held Celo mainnet agent completes one allowed route. Confirm the `PAYMENT-RESPONSE` receipt on Celoscan, publisher receipt, D1 aggregate, and `/api/stats` without exposing a payer address or full content path.
-5. Confirm origin redirects cannot leave the configured base path, a response larger than 4 MiB is rejected, and a stale or invalid `PAYCRAWL_GATEWAY_URL` makes the web console show an unavailable state.
-6. Enable Cloudflare WAF rate limits for `/health` and `/api/stats`, monitor Worker errors and `paycrawl-settlements-dlq`, and rotate both secrets after any suspected exposure.
-
-The repository contains no Cloudflare account, origin, DNS zone, or funded test-agent wallet; those publisher-controlled resources are required for the final live acceptance run and are intentionally not committed.
+PayCrawl is released under the [MIT License](./LICENSE).
