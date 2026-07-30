@@ -4,7 +4,9 @@ import { SiteFooter, SiteNav } from "../../components/site-chrome";
 const agentId = "9746";
 const owner = "0x24c9DEAF91f462EE6705F710C4D0aadCbD64b4E7";
 const identityRegistry = "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432";
-const agentUri = "https://paycrawl.vercel.app/.well-known/paycrawl-agent.json";
+const appUrl =
+  process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://paycrawl.vercel.app";
+const agentUri = `${appUrl.replace(/\/$/, "")}/.well-known/paycrawl-agent.json`;
 const attributionTag = "celo_468e1efe7287";
 const registrationTx =
   "0xe7c8b85f49518d5e73d2e324a4afa6a17de926c23ad7de734512763d65b2d910";
