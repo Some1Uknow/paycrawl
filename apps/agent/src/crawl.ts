@@ -19,7 +19,9 @@ import {
 } from "./payment.js";
 
 const MAX_SAFE_NETWORK_RETRIES = 2;
-export const DEFAULT_CRAWL_TIMEOUT_MS = 12_000;
+// Celo's x402 quote permits up to 60 seconds for settlement. Keep a small
+// delivery margin so a successful settlement can return its content and receipt.
+export const DEFAULT_CRAWL_TIMEOUT_MS = 75_000;
 export const DEFAULT_MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 
 export type CrawlTargetResult = {

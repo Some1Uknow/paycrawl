@@ -98,7 +98,7 @@ The configuration schema rejects a route above `1000000000` atomic units (1,000 
 - Verifies before origin access; settles only a successful `GET` origin response. Origin errors, unsafe redirects, and handler failures cancel the verified authorization rather than settling it.
 - Locks the proxy to one HTTPS DNS origin and rejects localhost, literal IPs, cross-host redirects, traversal, credentials, unsafe health paths, and redirects that escape the configured origin base path.
 - Forwards no cookies, authorization, payment, forwarding, or hop-by-hop headers to the origin. Paid responses are always `Cache-Control: private, no-store`.
-- Applies a 12-second origin timeout and a 4 MiB origin-response ceiling; the CLI separately caps fetched responses at 2 MiB by default.
+- Applies a 12-second origin timeout and a 4 MiB origin-response ceiling; the CLI separately waits up to 75 seconds for an x402 settlement response and caps fetched responses at 2 MiB by default.
 - Queues settlement analytics outside the payment path, retries D1 writes, retains data for 90 days, and places exhausted queue messages in `paycrawl-settlements-dlq` for operator review.
 - Stores only successful transaction hash, keyed payer HMAC, amount, route category, latency, and timestamp in D1. Public stats omit raw payer addresses, private paths, signatures, private URLs, and content.
 - Caches `/health` and `/api/stats` for 15 seconds to limit public-endpoint amplification. Add Cloudflare WAF rate-limit rules for these paths and alert on the dead-letter queue before enabling a public custom domain.

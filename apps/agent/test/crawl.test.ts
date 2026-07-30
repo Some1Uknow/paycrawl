@@ -3,7 +3,7 @@ import {
   encodePaymentResponseHeader,
 } from "@x402/core/http";
 import type { PaymentRequired } from "@x402/fetch";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { SpendBudget } from "../src/budget.js";
 import { crawlOne } from "../src/crawl.js";
@@ -141,6 +141,48 @@ describe("network retry policy", () => {
     ).rejects.toThrow(/not retried/);
 
     expect(signedCalls).toBe(1);
+  });
+
+  it("waits for a signed settlement response beyond the unsigned timeout", async () => {
+    vi.useFakeTimers();
+    let signedCalls = 0;
+    const fetchImpl: typeof fetch = async (input, init) => {
+      const request = new Request(input, init);
+      if (!request.headers.has("payment-signature")) return unpaidResponse();
+
+      signedCalls += 1;
+      return new Promise<Response>((resolve, reject) => {
+        const responseTimer = setTimeout(() => resolve(paidResponse()), 15_000);
+        init?.signal?.addEventListener(
+          "abort",
+          () => {
+            clearTimeout(responseTimer);
+            reject(new DOMException("request timed out", "AbortError"));
+          },
+          { once: true },
+        );
+      });
+    };
+
+    try {
+      const resultPromise = crawlOne({
+        url,
+        privateKey: payerKey,
+        payoutAllowlist: new Set([payTo.toLowerCase()]),
+        budget: new SpendBudget(10_000n, 10_000n),
+        usdcBalanceOf: async () => 10_000n,
+        fetchImpl,
+      });
+      await vi.advanceTimersByTimeAsync(15_000);
+
+      await expect(resultPromise).resolves.toMatchObject({
+        status: 200,
+        content: "paid article",
+      });
+      expect(signedCalls).toBe(1);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("rejects a private crawl target before any network request", async () => {
