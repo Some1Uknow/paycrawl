@@ -30,22 +30,30 @@ export function Mark(): React.ReactElement {
 
 export function SiteNav({ links, action }: SiteNavProps): React.ReactElement {
   return (
-    <nav className="nav" aria-label="Primary navigation">
-      <Link className="brand" href="/">
-        <Mark />
-        <span>PayCrawl</span>
-      </Link>
-      <div className="nav-links">
-        {links.map((link) => (
-          <a key={link.href} href={link.href}>
-            {link.label}
-          </a>
-        ))}
+    <>
+      <div className="agent-banner" role="note">
+        <span>AI agent?</span>
+        <a href="/skill.md">
+          Get the PayCrawl skill <span aria-hidden="true">↗</span>
+        </a>
       </div>
-      <a className="nav-cta" href={action.href}>
-        {action.label} <span aria-hidden="true">↗</span>
-      </a>
-    </nav>
+      <nav className="nav" aria-label="Primary navigation">
+        <Link className="brand" href="/">
+          <Mark />
+          <span>PayCrawl</span>
+        </Link>
+        <div className="nav-links">
+          {links.map((link) => (
+            <a key={link.href} href={link.href}>
+              {link.label}
+            </a>
+          ))}
+        </div>
+        <a className="nav-cta" href={action.href}>
+          {action.label} <span aria-hidden="true">↗</span>
+        </a>
+      </nav>
+    </>
   );
 }
 

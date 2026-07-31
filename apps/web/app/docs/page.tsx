@@ -124,7 +124,11 @@ export default function DocsPage(): React.ReactElement {
               <p>
                 Add the PayCrawl workflow skill to the agent project. It handles
                 discovery, quote validation, wallet setup, payment, and receipt
-                handling.
+                handling. The same skill is available at{" "}
+                <a className="text-link" href="/skill.md">
+                  /skill.md <span aria-hidden="true">↗</span>
+                </a>
+                .
               </p>
               <CodeBlock>
                 {

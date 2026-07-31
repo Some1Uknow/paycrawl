@@ -77,6 +77,40 @@ a {
   transform: translateY(0);
 }
 
+.agent-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  gap: 7px;
+  padding: 7px 24px;
+  border-bottom: 1px solid var(--line);
+  color: var(--text-faint);
+  font: 600 10px/1.2 var(--mono);
+}
+
+.agent-banner a {
+  color: var(--signal);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--signal) 35%, transparent);
+  text-underline-offset: 3px;
+  transition: color 160ms ease;
+}
+
+.agent-banner a:hover {
+  color: var(--text);
+}
+
+.agent-banner a span {
+  display: inline-block;
+  margin-left: 2px;
+  transition: transform 160ms ease;
+}
+
+.agent-banner a:hover span {
+  transform: translate(2px, -2px);
+}
+
 :focus-visible {
   outline: 2px solid var(--signal);
   outline-offset: 3px;
